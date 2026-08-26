@@ -1,0 +1,3480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sodhana Assessment Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #347363 0%, #1e3a2f 100%);
+            color: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: #ff751f;
+        }
+
+        .nav-item.active {
+            background-color: rgba(0, 212, 255, 0.2);
+            border-left-color: #ff751f;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 0 30px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid #e0e6ed;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #347363;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 1px solid #d0d6e0;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: #ff751f;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #ff751f;
+            box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff751f, #ff751f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Page Title */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #347363;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 22px 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid #ff751f;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+
+        .kpi-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+            border-left-width: 6px;
+        }
+
+        .kpi-card:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        .kpi-card.success {
+            border-left-color: #28a745;
+        }
+
+        .kpi-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .kpi-card.danger {
+            border-left-color: #dc3545;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #347363;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            color: #28a745;
+        }
+
+        .kpi-change.negative {
+            color: #dc3545;
+        }
+
+        .kpi-action-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #347363;
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .kpi-card:hover .kpi-action-hint {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #347363;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            background: #f8fafb;
+            border-bottom: 1px solid #e0e6ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #347363;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8fafb;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e0e6ed;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        .clickable-row {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Performance Level */
+        .performance-level {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .performance-excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .performance-proficient {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .performance-developing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .performance-beginning {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Gap Indicator */
+        .gap-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .gap-low {
+            background: #28a745;
+        }
+
+        .gap-medium {
+            background: #ffc107;
+        }
+
+        .gap-high {
+            background: #dc3545;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e0e6ed;
+            padding-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #347363;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: 300;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #347363;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Learning Gaps Section */
+        .gap-table {
+            margin-bottom: 30px;
+        }
+
+        .gap-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 80px 80px 80px 120px;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+        }
+
+        .gap-row:hover {
+            background: #fafbfc;
+        }
+
+        .gap-cell {
+            font-size: 13px;
+        }
+
+        .gap-value {
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Search Input */
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #d0d6e0;
+            border-radius: 6px;
+            font-size: 13px;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff751f;
+            box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.1);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f8fafb;
+            border-top: 1px solid #e0e6ed;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #d0d6e0;
+            background: white;
+            color: #333;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            border-color: #ff751f;
+            color: #ff751f;
+        }
+
+        .pagination button.active {
+            background: #ff751f;
+            color: white;
+            border-color: #ff751f;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Intervention Cards */
+        .intervention-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .intervention-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .intervention-header {
+            padding: 20px;
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .intervention-header.high {
+            background: #dc3545;
+        }
+
+        .intervention-header.medium {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .intervention-header.low {
+            background: #28a745;
+        }
+
+        .intervention-list {
+            padding: 20px;
+        }
+
+        .intervention-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 13px;
+        }
+
+        .intervention-item:last-child {
+            border-bottom: none;
+        }
+
+        .intervention-item strong {
+            color: #347363;
+        }
+
+        /* Button */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #ff751f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0088a8;
+        }
+
+        .btn-secondary {
+            background: #e0e6ed;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d6e0;
+        }
+
+        /* Report Section */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .report-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #347363;
+            margin-bottom: 10px;
+        }
+
+        .report-description {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gap-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-right {
+                gap: 10px;
+            }
+
+            .filter-group {
+                flex-direction: column;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .page-header h2 {
+                font-size: 22px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 60px;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .sidebar-header {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                gap: 0;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+                padding: 10px 15px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .gap-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        /* ========================================== */
+        /* Executive Report Card & A4 Print Styles     */
+        /* ========================================== */
+        .report-a4-sheet {
+            --a4w: min(210mm, calc(100vw - 32px));
+            width: var(--a4w);
+            height: auto;
+            margin: 0 auto 24px;
+            padding: 12mm;
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            overflow: visible;
+            position: relative;
+            border-radius: 12px;
+        }
+
+        @media screen and (max-width: 640px) {
+            .report-a4-sheet {
+                padding: 5mm;
+            }
+        }
+
+        .report-a4-fit {
+            zoom: 1;
+        }
+
+        .print-avoid-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .report-a4-sheet table tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .report-a4-sheet table thead {
+            display: table-header-group;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .header,
+            .filter-group,
+            .pagination,
+            .modal:not(#report-modal),
+            .nav-item,
+            .no-print,
+            header,
+            aside,
+            .dashboard-container > .sidebar,
+            .dashboard-container > .main-content > .header,
+            .dashboard-container > .main-content > .content {
+                display: none !important;
+            }
+
+            html,
+            body {
+                height: auto !important;
+                overflow: visible !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+
+            #report-modal {
+                display: block !important;
+                position: static !important;
+                inset: auto !important;
+                overflow: visible !important;
+                height: auto !important;
+                background: none !important;
+                z-index: auto !important;
+            }
+
+            #report-modal > div {
+                display: block !important;
+                position: static !important;
+                min-height: 0 !important;
+                padding: 0 !important;
+            }
+
+            #report-modal-card {
+                display: block !important;
+                max-width: none !important;
+                width: auto !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                background: none !important;
+            }
+
+            #report-modal-scroll {
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+
+            .report-a4-sheet {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 6mm 8mm !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: #ffffff !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="h-full bg-gray-50">
+    <!-- ===== LOGIN SCREEN =====
+       Convenience gate, not real security: credentials live in this file, and the underlying
+       Google Sheets are already public links the browser fetches directly regardless of login.
+       This exists so each school principal lands pre-scoped to their own branch instead of
+       manually picking it from a dropdown every time. See LOGIN_ACCOUNTS in the script below. -->
+    <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden"
+        style="background: linear-gradient(135deg, #2a5c4d 0%, #347363 55%, #1e3a2f 100%);">
+        <!-- Decorative scattered learning icons — purely visual, sits behind the card -->
+        <div class="absolute inset-0 z-0 pointer-events-none select-none" aria-hidden="true">
+            <span
+                style="position:absolute; top:6%; left:8%; font-size:2.6rem; opacity:0.16; transform:rotate(-14deg);">📚</span>
+            <span
+                style="position:absolute; top:14%; left:86%; font-size:2.2rem; opacity:0.18; transform:rotate(10deg);">✏️</span>
+            <span
+                style="position:absolute; top:76%; left:10%; font-size:2.8rem; opacity:0.15; transform:rotate(8deg);">🎓</span>
+            <span
+                style="position:absolute; top:84%; left:80%; font-size:2.4rem; opacity:0.17; transform:rotate(-8deg);">📐</span>
+            <span
+                style="position:absolute; top:42%; left:4%; font-size:2.3rem; opacity:0.16; transform:rotate(-6deg);">🧮</span>
+            <span
+                style="position:absolute; top:18%; left:46%; font-size:2rem; opacity:0.12; transform:rotate(12deg);">🔬</span>
+            <span
+                style="position:absolute; top:62%; left:92%; font-size:2.5rem; opacity:0.16; transform:rotate(-10deg);">📖</span>
+            <span
+                style="position:absolute; top:8%; left:62%; font-size:1.8rem; opacity:0.2; transform:rotate(-15deg);">✨</span>
+            <span
+                style="position:absolute; top:91%; left:42%; font-size:2.1rem; opacity:0.17; transform:rotate(14deg);">💡</span>
+            <span
+                style="position:absolute; top:34%; left:94%; font-size:2.3rem; opacity:0.15; transform:rotate(9deg);">🖍️</span>
+            <span
+                style="position:absolute; top:71%; left:58%; font-size:1.9rem; opacity:0.12; transform:rotate(-9deg);">🔢</span>
+            <span
+                style="position:absolute; top:4%; left:33%; font-size:2.2rem; opacity:0.16; transform:rotate(7deg);">🧠</span>
+            <span
+                style="position:absolute; top:52%; left:6%; font-size:2.4rem; opacity:0.15; transform:rotate(-11deg);">🎨</span>
+            <span
+                style="position:absolute; top:26%; left:72%; font-size:2rem; opacity:0.18; transform:rotate(13deg);">🌟</span>
+            <span
+                style="position:absolute; top:80%; left:28%; font-size:2.2rem; opacity:0.16; transform:rotate(-7deg);">📏</span>
+            <span
+                style="position:absolute; top:47%; left:82%; font-size:2.1rem; opacity:0.14; transform:rotate(10deg);">🧪</span>
+            <span
+                style="position:absolute; top:66%; left:2%; font-size:2.3rem; opacity:0.15; transform:rotate(-13deg);">🖊️</span>
+            <span
+                style="position:absolute; top:12%; left:20%; font-size:2rem; opacity:0.14; transform:rotate(6deg);">📓</span>
+            <span
+                style="position:absolute; top:94%; left:66%; font-size:2.2rem; opacity:0.16; transform:rotate(-10deg);">🔤</span>
+            <span
+                style="position:absolute; top:30%; left:16%; font-size:1.9rem; opacity:0.13; transform:rotate(11deg);">📝</span>
+            <span
+                style="position:absolute; top:2%; left:78%; font-size:2.1rem; opacity:0.15; transform:rotate(-9deg);">🌍</span>
+            <span
+                style="position:absolute; top:96%; left:12%; font-size:2rem; opacity:0.14; transform:rotate(8deg);">✨</span>
+        </div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10">
+            <div class="flex flex-col items-center mb-6">
+                <img src="northsouth-logo.jpg" alt="NorthSouth Foundation Logo"
+                    class="h-16 w-auto rounded-lg shadow-sm bg-white p-1 mb-2.5">
+                <h1 class="text-xl font-bold text-gray-800 text-center">NorthSouth Foundation</h1>
+                <p class="text-xs text-gray-500 text-center mt-1">SODHANA Diagnostic Performance Dashboard</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5"
+                        for="login-username">Username</label>
+                    <input type="text" id="login-username" autocomplete="username"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg outline-none focus:border-[#347363] transition-colors"
+                        placeholder="Enter your username">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5"
+                        for="login-password">Password</label>
+                    <input type="password" id="login-password" autocomplete="current-password"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg outline-none focus:border-[#347363] transition-colors"
+                        placeholder="Enter your password">
+                </div>
+                <div id="login-error" class="hidden text-xs text-red-600 font-semibold text-center"></div>
+                <button type="submit"
+                    class="w-full py-3 bg-[#347363] hover:bg-[#28584c] text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                    Sign In
+                </button>
+            </form>
+            <p class="text-[11px] text-gray-400 text-center mt-4">Demo: username <b>admin</b> / password <b>admin123</b></p>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header" style="display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <img src="northsouth-logo.jpg" alt="NorthSouth Foundation" style="height: 38px; width: auto; border-radius: 6px; background: #fff; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                <div>
+                    <h1 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2;">SODHANA</h1>
+                    <p style="font-size: 11px; color: rgba(255,255,255,0.75); margin: 0;">Assessment Dashboard</p>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active" data-page="overview">
+                    <span class="nav-icon">📈</span>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item" data-page="performance">
+                    <span class="nav-icon">⭐</span>
+                    <span>Performance</span>
+                </div>
+                <div class="nav-item" data-page="gaps">
+                    <span class="nav-icon">⚠️</span>
+                    <span>Learning Gaps</span>
+                </div>
+                <div class="nav-item" data-page="subjects">
+                    <span class="nav-icon">📚</span>
+                    <span>Subjects</span>
+                </div>
+                <div class="nav-item" data-page="questions">
+                    <span class="nav-icon">❓</span>
+                    <span>Questions</span>
+                </div>
+                <div class="nav-item" data-page="students">
+                    <span class="nav-icon">👥</span>
+                    <span>Students</span>
+                </div>
+                <div class="nav-item" data-page="schools">
+                    <span class="nav-icon">🏫</span>
+                    <span>Schools</span>
+                </div>
+                <div class="nav-item" data-page="interventions">
+                    <span class="nav-icon">🎯</span>
+                    <span>Interventions</span>
+                </div>
+                <div class="nav-item" data-page="reports">
+                    <span class="nav-icon">📋</span>
+                    <span>Reports</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">Sodhana Assessment</div>
+                <div class="header-right">
+                    <div class="filter-group">
+                        <select class="filter-select" id="yearSelect">
+                            <option>Academic Year 2024-25</option>
+                            <option>Academic Year 2023-24</option>
+                        </select>
+                        <select class="filter-select" id="cycleSelect">
+                            <option>Samagra </option>
+                            <option>Sodhana 1</option>
+                            <option>Sodhana 2</option>
+                        </select>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">PT</div>
+                        <span>Profile</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                <!-- Overview Page -->
+                <div id="overview" class="page active">
+                    <div class="page-header">
+                        <h2>Dashboard Overview</h2>
+                        <p>Real-time assessment analytics and learning insights</p>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <!-- Card 1: Students Assessed & Participation -->
+                        <div class="kpi-card" onclick="navigateToPage('students')" title="Click to view Student Roster & Attendance">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="kpi-label" style="margin-bottom: 0;">👥 Students Assessed</div>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span class="kpi-counter" data-target="96.8" data-format="pct">96.8%</span> Turnout
+                                </span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <div class="kpi-value kpi-counter" data-target="2756" data-format="comma" style="margin-bottom: 0;">2,756</div>
+                                <span class="text-xs font-semibold text-gray-500">/ <span class="kpi-counter" data-target="2847" data-format="comma">2,847</span> Enrolled</span>
+                            </div>
+                            <!-- Participation Progress Bar -->
+                            <div class="w-full bg-gray-100 rounded-full h-2 my-2.5 overflow-hidden">
+                                <div class="participation-bar bg-gradient-to-r from-[#347363] to-[#28a745] h-2 rounded-full transition-all duration-1000" style="width: 0%;" data-width="96.8%" title="2,756 of 2,847 students assessed (96.8%)"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-gray-500">
+                                <span class="kpi-change font-medium">↑ 12% vs last term</span>
+                                <span class="text-[11px] text-gray-400">91 Absent (3.2%)</span>
+                            </div>
+                            <div class="kpi-action-hint">View Roster →</div>
+                        </div>
+
+                        <!-- Card 2: Average Score -->
+                        <div class="kpi-card success" onclick="navigateToPage('performance')" title="Click to view Performance Breakdown">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="kpi-label" style="margin-bottom: 0;">🎯 Average Score</div>
+                                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Proficient</span>
+                            </div>
+                            <div class="kpi-value kpi-counter" data-target="68.4" data-format="pct">68.4%</div>
+                            <div class="kpi-change font-medium">↑ 3.2% improvement</div>
+                            <div class="kpi-action-hint">View Analytics →</div>
+                        </div>
+
+                        <!-- Card 3: Below Grade Level -->
+                        <div class="kpi-card warning" onclick="navigateToPage('interventions')" title="Click to view Remediation Support Plans">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="kpi-label" style="margin-bottom: 0;">⚠️ Below Grade Level</div>
+                                <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Target Support</span>
+                            </div>
+                            <div class="kpi-value kpi-counter" data-target="356" data-format="comma">356</div>
+                            <div class="kpi-change">12.9% of assessed</div>
+                            <div class="kpi-action-hint">View Support →</div>
+                        </div>
+
+                        <!-- Card 4: Critical Gaps -->
+                        <div class="kpi-card danger" onclick="navigateToPage('gaps')" title="Click to view Competency Gap Analysis">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="kpi-label" style="margin-bottom: 0;">📉 Critical Gaps</div>
+                                <span class="text-[11px] font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">High Priority</span>
+                            </div>
+                            <div class="kpi-value kpi-counter" data-target="24" data-format="number" style="color: #dc3545;">24</div>
+                            <div class="kpi-change negative">↑ 2 new gaps</div>
+                            <div class="kpi-action-hint">View Gaps →</div>
+                        </div>
+
+                        <!-- Card 5: Schools Assessed -->
+                        <div class="kpi-card" onclick="navigateToPage('schools')" title="Click to compare Schools & Districts">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="kpi-label" style="margin-bottom: 0;">🏫 Schools Assessed</div>
+                                <span class="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded">Coverage</span>
+                            </div>
+                            <div class="kpi-value kpi-counter" data-target="52" data-format="number">52</div>
+                            <div class="kpi-change" style="color:#666;">All districts covered</div>
+                            <div class="kpi-action-hint">Compare Schools →</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-title">📊 Performance by Subject</div>
+                            <div class="chart-canvas">
+                                <canvas id="subjectChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">📈 Grade-wise Performance</div>
+                            <div class="chart-canvas">
+                                <canvas id="gradeChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">🎯 Performance Levels</div>
+                            <div class="chart-canvas">
+                                <canvas id="levelsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">🏫 School Performance</div>
+                            <div class="chart-canvas">
+                                <canvas id="schoolChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Critical Learning Gaps -->
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">⚠️ Top 5 Critical Learning Gaps</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Competency</th>
+                                    <th>Gap %</th>
+                                    <th>Students Affected</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mathematics</td>
+                                    <td>Fractions - Division</td>
+                                    <td><strong style="color: #dc3545;">45%</strong></td>
+                                    <td>286 students</td>
+                                    <td><span class="badge danger">Critical</span></td>
+                                </tr>
+                                <tr>
+                                    <td>English</td>
+                                    <td>Comprehension - Inference</td>
+                                    <td><strong style="color: #dc3545;">38%</strong></td>
+                                    <td>234 students</td>
+                                    <td><span class="badge danger">Critical</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Science</td>
+                                    <td>Photosynthesis</td>
+                                    <td><strong style="color: #ffc107;">34%</strong></td>
+                                    <td>198 students</td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Mathematics</td>
+                                    <td>Decimals - Addition</td>
+                                    <td><strong style="color: #ffc107;">32%</strong></td>
+                                    <td>176 students</td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>English</td>
+                                    <td>Grammar - Tenses</td>
+                                    <td><strong style="color: #ffc107;">28%</strong></td>
+                                    <td>142 students</td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Page -->
+                <div id="performance" class="page">
+                    <div class="page-header">
+                        <h2>Performance Analysis</h2>
+                        <p>Detailed performance metrics by grade and subject</p>
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 20px;">
+                        <select class="filter-select" id="gradeFilter">
+                            <option value="">All Grades</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                            <option value="7">Grade 7</option>
+                            <option value="8">Grade 8</option>
+                            <option value="9">Grade 9</option>
+                            <option value="10">Grade 10</option>
+                        </select>
+                        <select class="filter-select" id="subjectFilter">
+                            <option value="">All Subjects</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="English">English</option>
+                            <option value="Science">Science</option>
+                        </select>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-title">📊 Subject Performance Comparison</div>
+                            <div class="chart-canvas">
+                                <canvas id="performanceSubjectChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">📈 Grade-wise Trend</div>
+                            <div class="chart-canvas">
+                                <canvas id="performanceGradeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">Grade-wise Performance Summary</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Students</th>
+                                    <th>Avg Score</th>
+                                    <th>Math</th>
+                                    <th>English</th>
+                                    <th>Science</th>
+                                    <th>Excellent %</th>
+                                    <th>Below Grade %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Grade 3</strong></td>
+                                    <td>312</td>
+                                    <td>71.2%</td>
+                                    <td>72.1%</td>
+                                    <td>70.8%</td>
+                                    <td>70.7%</td>
+                                    <td>48%</td>
+                                    <td>8%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 4</strong></td>
+                                    <td>298</td>
+                                    <td>69.8%</td>
+                                    <td>70.4%</td>
+                                    <td>68.2%</td>
+                                    <td>70.8%</td>
+                                    <td>42%</td>
+                                    <td>11%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 5</strong></td>
+                                    <td>287</td>
+                                    <td>68.4%</td>
+                                    <td>67.8%</td>
+                                    <td>68.9%</td>
+                                    <td>68.5%</td>
+                                    <td>38%</td>
+                                    <td>13%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 6</strong></td>
+                                    <td>315</td>
+                                    <td>67.2%</td>
+                                    <td>66.5%</td>
+                                    <td>67.8%</td>
+                                    <td>67.3%</td>
+                                    <td>35%</td>
+                                    <td>14%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 7</strong></td>
+                                    <td>304</td>
+                                    <td>66.8%</td>
+                                    <td>65.9%</td>
+                                    <td>67.2%</td>
+                                    <td>67.3%</td>
+                                    <td>33%</td>
+                                    <td>15%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 8</strong></td>
+                                    <td>318</td>
+                                    <td>68.1%</td>
+                                    <td>69.2%</td>
+                                    <td>67.4%</td>
+                                    <td>67.7%</td>
+                                    <td>36%</td>
+                                    <td>12%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 9</strong></td>
+                                    <td>296</td>
+                                    <td>67.5%</td>
+                                    <td>68.1%</td>
+                                    <td>66.8%</td>
+                                    <td>67.6%</td>
+                                    <td>34%</td>
+                                    <td>14%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 10</strong></td>
+                                    <td>226</td>
+                                    <td>69.2%</td>
+                                    <td>70.1%</td>
+                                    <td>68.5%</td>
+                                    <td>69.0%</td>
+                                    <td>40%</td>
+                                    <td>10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Learning Gaps Page -->
+                <div id="gaps" class="page">
+                    <div class="page-header">
+                        <h2>Learning Gap Analysis</h2>
+                        <p>Detailed competency gaps across subjects and grades</p>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">Competency-wise Learning Gaps</div>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Competency</th>
+                                        <th>Grade</th>
+                                        <th>Expected</th>
+                                        <th>Actual</th>
+                                        <th>Gap %</th>
+                                        <th>Students Affected</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Mathematics</td>
+                                        <td>Fractions - Division</td>
+                                        <td>5</td>
+                                        <td>85%</td>
+                                        <td>40%</td>
+                                        <td><span class="gap-indicator gap-high"></span><strong>45%</strong></td>
+                                        <td>156</td>
+                                        <td><span class="badge danger">Critical</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>English</td>
+                                        <td>Comprehension - Inference</td>
+                                        <td>6</td>
+                                        <td>80%</td>
+                                        <td>42%</td>
+                                        <td><span class="gap-indicator gap-high"></span><strong>38%</strong></td>
+                                        <td>124</td>
+                                        <td><span class="badge danger">Critical</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Science</td>
+                                        <td>Photosynthesis</td>
+                                        <td>7</td>
+                                        <td>80%</td>
+                                        <td>46%</td>
+                                        <td><span class="gap-indicator gap-medium"></span><strong>34%</strong></td>
+                                        <td>98</td>
+                                        <td><span class="badge warning">High</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mathematics</td>
+                                        <td>Decimals - Addition</td>
+                                        <td>4</td>
+                                        <td>85%</td>
+                                        <td>53%</td>
+                                        <td><span class="gap-indicator gap-medium"></span><strong>32%</strong></td>
+                                        <td>87</td>
+                                        <td><span class="badge warning">High</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>English</td>
+                                        <td>Grammar - Tenses</td>
+                                        <td>5</td>
+                                        <td>80%</td>
+                                        <td>52%</td>
+                                        <td><span class="gap-indicator gap-medium"></span><strong>28%</strong></td>
+                                        <td>72</td>
+                                        <td><span class="badge warning">High</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Science</td>
+                                        <td>Cellular Structure</td>
+                                        <td>8</td>
+                                        <td>75%</td>
+                                        <td>51%</td>
+                                        <td><span class="gap-indicator gap-medium"></span><strong>24%</strong></td>
+                                        <td>65</td>
+                                        <td><span class="badge warning">High</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mathematics</td>
+                                        <td>Ratio & Proportion</td>
+                                        <td>6</td>
+                                        <td>80%</td>
+                                        <td>61%</td>
+                                        <td><span class="gap-indicator gap-medium"></span><strong>19%</strong></td>
+                                        <td>54</td>
+                                        <td><span class="badge warning">Medium</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>English</td>
+                                        <td>Vocabulary Building</td>
+                                        <td>4</td>
+                                        <td>85%</td>
+                                        <td>70%</td>
+                                        <td><span class="gap-indicator gap-low"></span><strong>15%</strong></td>
+                                        <td>42</td>
+                                        <td><span class="badge success">Low</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subjects Page -->
+                <div id="subjects" class="page">
+                    <div class="page-header">
+                        <h2>Subject Analysis</h2>
+                        <p>In-depth analysis of each subject's performance</p>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-title">📊 Mathematics Performance</div>
+                            <div class="chart-canvas">
+                                <canvas id="mathChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">📊 English Performance</div>
+                            <div class="chart-canvas">
+                                <canvas id="englishChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">📊 Science Performance</div>
+                            <div class="chart-canvas">
+                                <canvas id="scienceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">Subject-wise Summary</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Avg Score</th>
+                                    <th>Excellent</th>
+                                    <th>Proficient</th>
+                                    <th>Developing</th>
+                                    <th>Beginning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Mathematics</strong></td>
+                                    <td>68.9%</td>
+                                    <td>32%</td>
+                                    <td>38%</td>
+                                    <td>22%</td>
+                                    <td>8%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>English</strong></td>
+                                    <td>67.8%</td>
+                                    <td>28%</td>
+                                    <td>40%</td>
+                                    <td>24%</td>
+                                    <td>8%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Science</strong></td>
+                                    <td>68.4%</td>
+                                    <td>30%</td>
+                                    <td>39%</td>
+                                    <td>23%</td>
+                                    <td>8%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Questions Page -->
+                <div id="questions" class="page">
+                    <div class="page-header">
+                        <h2>Question Analysis</h2>
+                        <p>Item-level performance metrics and difficulty analysis</p>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">Question Performance Metrics</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Q#</th>
+                                    <th>Subject</th>
+                                    <th>Topic</th>
+                                    <th>Competency</th>
+                                    <th>Correct %</th>
+                                    <th>Incorrect %</th>
+                                    <th>Difficulty</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1</strong></td>
+                                    <td>Mathematics</td>
+                                    <td>Fractions</td>
+                                    <td>Division</td>
+                                    <td><strong style="color: #dc3545;">38%</strong></td>
+                                    <td>62%</td>
+                                    <td><span class="badge danger">Hard</span></td>
+                                    <td><span class="badge danger">Critical</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2</strong></td>
+                                    <td>English</td>
+                                    <td>Comprehension</td>
+                                    <td>Inference</td>
+                                    <td><strong style="color: #dc3545;">42%</strong></td>
+                                    <td>58%</td>
+                                    <td><span class="badge danger">Hard</span></td>
+                                    <td><span class="badge danger">Critical</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3</strong></td>
+                                    <td>Science</td>
+                                    <td>Biology</td>
+                                    <td>Photosynthesis</td>
+                                    <td><strong style="color: #ffc107;">54%</strong></td>
+                                    <td>46%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4</strong></td>
+                                    <td>Mathematics</td>
+                                    <td>Decimals</td>
+                                    <td>Addition</td>
+                                    <td><strong style="color: #ffc107;">56%</strong></td>
+                                    <td>44%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5</strong></td>
+                                    <td>English</td>
+                                    <td>Grammar</td>
+                                    <td>Tenses</td>
+                                    <td><strong style="color: #ffc107;">59%</strong></td>
+                                    <td>41%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                    <td><span class="badge warning">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6</strong></td>
+                                    <td>Science</td>
+                                    <td>Biology</td>
+                                    <td>Cell Structure</td>
+                                    <td><strong style="color: #ffc107;">64%</strong></td>
+                                    <td>36%</td>
+                                    <td><span class="badge info">Easy</span></td>
+                                    <td><span class="badge info">Moderate</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>7</strong></td>
+                                    <td>Mathematics</td>
+                                    <td>Geometry</td>
+                                    <td>Area & Perimeter</td>
+                                    <td><strong style="color: #28a745;">78%</strong></td>
+                                    <td>22%</td>
+                                    <td><span class="badge success">Easy</span></td>
+                                    <td><span class="badge success">Good</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>8</strong></td>
+                                    <td>English</td>
+                                    <td>Vocabulary</td>
+                                    <td>Word Meaning</td>
+                                    <td><strong style="color: #28a745;">82%</strong></td>
+                                    <td>18%</td>
+                                    <td><span class="badge success">Easy</span></td>
+                                    <td><span class="badge success">Good</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Students Page -->
+                <div id="students" class="page">
+                    <div class="page-header">
+                        <h2>Student Performance</h2>
+                        <p>Individual student assessment results and progress</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" class="search-input" id="studentSearch"
+                            placeholder="Search student by name or ID...">
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">Student Assessment Results</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Grade</th>
+                                    <th>School</th>
+                                    <th>Math</th>
+                                    <th>English</th>
+                                    <th>Science</th>
+                                    <th>Overall</th>
+                                    <th>Level</th>
+                                    <th>Gap Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                            </tbody>
+                        </table>
+                        <div class="pagination" id="studentPagination"></div>
+                    </div>
+                </div>
+
+                <!-- Schools Page -->
+                <div id="schools" class="page">
+                    <div class="page-header">
+                        <h2>School Performance</h2>
+                        <p>School-level aggregated metrics and comparison</p>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-header-title">School-wise Performance Summary</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>School Name</th>
+                                    <th>District</th>
+                                    <th>Students Assessed</th>
+                                    <th>Participation %</th>
+                                    <th>Avg Score</th>
+                                    <th>Grade Level %</th>
+                                    <th>Learning Gap %</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Government Primary School #1</strong></td>
+                                    <td>Central</td>
+                                    <td>185</td>
+                                    <td>98%</td>
+                                    <td>72.4%</td>
+                                    <td>68%</td>
+                                    <td>12%</td>
+                                    <td><span class="badge success">Low</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government Primary School #2</strong></td>
+                                    <td>North</td>
+                                    <td>142</td>
+                                    <td>96%</td>
+                                    <td>65.8%</td>
+                                    <td>58%</td>
+                                    <td>22%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government Primary School #3</strong></td>
+                                    <td>South</td>
+                                    <td>108</td>
+                                    <td>91%</td>
+                                    <td>62.1%</td>
+                                    <td>48%</td>
+                                    <td>32%</td>
+                                    <td><span class="badge danger">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government Upper Primary #1</strong></td>
+                                    <td>Central</td>
+                                    <td>256</td>
+                                    <td>97%</td>
+                                    <td>68.9%</td>
+                                    <td>62%</td>
+                                    <td>18%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government Upper Primary #2</strong></td>
+                                    <td>East</td>
+                                    <td>198</td>
+                                    <td>94%</td>
+                                    <td>64.5%</td>
+                                    <td>52%</td>
+                                    <td>28%</td>
+                                    <td><span class="badge warning">Medium</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government Upper Primary #3</strong></td>
+                                    <td>West</td>
+                                    <td>122</td>
+                                    <td>88%</td>
+                                    <td>59.2%</td>
+                                    <td>42%</td>
+                                    <td>38%</td>
+                                    <td><span class="badge danger">High</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Interventions Page -->
+                <div id="interventions" class="page">
+                    <div class="page-header">
+                        <h2>Intervention Priorities</h2>
+                        <p>Targeted support and remediation recommendations</p>
+                    </div>
+
+                    <div class="intervention-grid">
+                        <div class="intervention-card">
+                            <div class="intervention-header high">
+                                🔴 HIGH PRIORITY - Immediate Action Required
+                            </div>
+                            <div class="intervention-list">
+                                <div class="intervention-item">
+                                    <strong>Mathematics - Fractions Division</strong><br>
+                                    286 students | Gap: 45% | Grade 5<br>
+                                    Action: Daily fraction practice, visual aids, peer tutoring
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>English - Reading Comprehension</strong><br>
+                                    234 students | Gap: 38% | Grade 6<br>
+                                    Action: Guided reading sessions, inference strategy training
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Schools: Government Upper Primary #3</strong><br>
+                                    122 students | Overall Gap: 38%<br>
+                                    Action: Resource allocation, teacher professional development
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Below Grade Level Students</strong><br>
+                                    356 students | Overall Performance: Below Grade<br>
+                                    Action: Remedial classes, one-on-one tutoring
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="intervention-card">
+                            <div class="intervention-header medium">
+                                🟡 MEDIUM PRIORITY - Targeted Support
+                            </div>
+                            <div class="intervention-list">
+                                <div class="intervention-item">
+                                    <strong>Science - Photosynthesis</strong><br>
+                                    198 students | Gap: 34% | Grade 7<br>
+                                    Action: Lab activities, concept mapping
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Mathematics - Decimals</strong><br>
+                                    176 students | Gap: 32% | Grade 4<br>
+                                    Action: Place value activities, decimal games
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>English - Grammar</strong><br>
+                                    142 students | Gap: 28% | Grade 5<br>
+                                    Action: Grammar practice, sentence construction activities
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Schools: Government Primary School #2</strong><br>
+                                    142 students | Overall Gap: 22%<br>
+                                    Action: Training programs, resource support
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="intervention-card">
+                            <div class="intervention-header low">
+                                🟢 LOW PRIORITY - Monitoring & Enrichment
+                            </div>
+                            <div class="intervention-list">
+                                <div class="intervention-item">
+                                    <strong>Monitor Progress</strong><br>
+                                    Developing students | Approaching Grade Level<br>
+                                    Action: Regular assessment, progress monitoring
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Enrichment Programs</strong><br>
+                                    Excellent performers | Beyond Grade Level<br>
+                                    Action: Advanced content, leadership roles, peer tutoring
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Continuous Improvement</strong><br>
+                                    All schools performing above 65%<br>
+                                    Action: Best practice sharing, innovation pilots
+                                </div>
+                                <div class="intervention-item">
+                                    <strong>Schools: Government Primary School #1</strong><br>
+                                    185 students | Overall Performance: Excellent<br>
+                                    Action: Maintain standards, share best practices
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports" class="page">
+                    <div class="page-header">
+                        <h2>Generate Reports</h2>
+                        <p>Printable and downloadable assessment reports</p>
+                    </div>
+
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-icon">👨‍🎓</div>
+                            <div class="report-title">Student Report</div>
+                            <div class="report-description">Individual student performance summary with subject scores
+                                and recommendations</div>
+                            <button class="btn btn-primary" onclick="generateReport('student')">Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">🏫</div>
+                            <div class="report-title">School Report</div>
+                            <div class="report-description">School-level aggregated performance metrics and comparative
+                                analysis</div>
+                            <button class="btn btn-primary" onclick="generateReport('school')">Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">👨‍💼</div>
+                            <div class="report-title">Principal Report</div>
+                            <div class="report-description">Executive summary with key insights and intervention
+                                priorities</div>
+                            <button class="btn btn-primary" onclick="generateReport('principal')">Generate
+                                Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">📊</div>
+                            <div class="report-title">Grade Report</div>
+                            <div class="report-description">Grade-wise performance summary across all students and
+                                subjects</div>
+                            <button class="btn btn-primary" onclick="generateReport('grade')">Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">⚠️</div>
+                            <div class="report-title">Learning Gap Report</div>
+                            <div class="report-description">Detailed analysis of learning gaps and affected student
+                                populations</div>
+                            <button class="btn btn-primary" onclick="generateReport('gaps')">Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">🎯</div>
+                            <div class="report-title">Intervention Report</div>
+                            <div class="report-description">Prioritized intervention recommendations and action plans
+                            </div>
+                            <button class="btn btn-primary" onclick="generateReport('intervention')">Generate
+                                Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- EXACT SODHANA STUDENT REPORT CARD MODAL     -->
+    <!-- ========================================== -->
+    <div id="report-modal" class="fixed inset-0 z-[120] hidden bg-black/70 backdrop-blur-sm flex flex-col" role="dialog" aria-modal="true">
+        <div id="report-modal-card" class="flex flex-col h-full w-full bg-[#f3f4f6] text-left">
+            <!-- Top Control Bar (Screen only) -->
+            <div id="report-modal-body" class="no-print flex justify-between items-center gap-3 px-4 sm:px-6 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📋</span>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 leading-tight">SODHANA Student Report Card</h3>
+                        <p class="text-xs text-gray-500">Official Diagnostic Assessment Evaluation Sheet</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <label class="text-xs font-bold text-gray-600 hidden sm:inline">Select Student:</label>
+                    <select id="report-modal-student-picker" onchange="onReportStudentPicked(this.value)" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold bg-gray-50 text-gray-700 outline-none focus:border-[#347363]">
+                    </select>
+                    <button onclick="window.print()" class="px-4 py-2 bg-[#2d6a4f] text-white rounded-lg font-bold hover:bg-[#1b4332] flex items-center gap-1.5 text-xs sm:text-sm shadow transition-all">
+                        <span>🖨️</span> <span>Print / Save PDF</span>
+                    </button>
+                    <button onclick="closeReportModal()" class="px-3.5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-bold text-xs sm:text-sm transition-colors">
+                        ✕ Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Container -->
+            <div id="report-modal-scroll" class="flex-1 overflow-y-auto px-2 sm:px-6 py-4" style="background:#eaedf0;">
+                
+                <!-- ========================================================================= -->
+                <!-- COMPACT SODHANA STUDENT REPORT CARD (EXECUTIVE SINGLE-PAGE LAYOUT)         -->
+                <!-- ========================================================================= -->
+                <div id="report-a4-sheet" class="report-a4-sheet" style="max-width: 880px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #334155; line-height: 1.35;">
+                    
+                    <!-- 1. COMPACT HEADER -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="northsouth-logo.jpg" alt="NorthSouth Foundation" style="height: 36px; width: auto; object-fit: contain;">
+                        </div>
+
+                        <div style="text-align: center;">
+                            <h1 style="font-size: 17px; font-weight: 700; color: #1e3a2f; letter-spacing: 0.3px; margin: 0; text-transform: uppercase;">SODHANA STUDENT REPORT CARD</h1>
+                            <div style="font-size: 11px; font-weight: 500; color: #64748b; margin-top: 1px;" id="rc-assessment-cycle">Assessment 2025-26</div>
+                        </div>
+
+                        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 10px; text-align: center; background: #f8fafc;">
+                            <div style="font-size: 10px; font-weight: 700; color: #1e3a2f; text-transform: uppercase;">SODHANA</div>
+                            <div style="font-size: 9px; color: #64748b;">Diagnostic Evaluation</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. STUDENT METADATA BAR -->
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; background: #f8fafc; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">STUDENT NAME</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #0f172a; margin-top: 1px;" id="rc-student-name">A Gamya</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">GRADE &amp; SECTION</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #0f172a; margin-top: 1px;" id="rc-student-grade">Grade 6 - Section C</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">STUDENT ID</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #0f172a; margin-top: 1px;" id="rc-student-id">8153700340</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">SCHOOL</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #0f172a; margin-top: 1px;" id="rc-student-school">Global Edge, Madhapur</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">ASSESSMENT DATE</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #0f172a; margin-top: 1px;" id="rc-assessment-date">15 May 2026</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. OVERALL PERFORMANCE (All Subjects) -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.3px;">
+                            OVERALL PERFORMANCE <span style="font-weight: 500; color: #64748b; text-transform: none;">(All Subjects)</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1.2fr 1.4fr 1.8fr; gap: 8px;">
+                            <!-- Overall Average -->
+                            <div style="border: 1px solid #dbeafe; border-radius: 8px; padding: 6px 10px; background: #eff6ff;">
+                                <div style="font-size: 9px; font-weight: 600; color: #1d4ed8; text-transform: uppercase;">
+                                    📊 OVERALL AVERAGE
+                                </div>
+                                <div style="font-size: 19px; font-weight: 700; color: #1e3a8a; margin: 2px 0 1px 0;" id="rc-overall-score">76%</div>
+                                <div style="font-size: 10px; color: #475569;" id="rc-overall-fraction">114 / 150 Correct</div>
+                            </div>
+
+                            <!-- Total Questions -->
+                            <div style="border: 1px solid #ede9fe; border-radius: 8px; padding: 6px 10px; background: #faf5ff;">
+                                <div style="font-size: 9px; font-weight: 600; color: #7e22ce; text-transform: uppercase;">
+                                    ❓ TOTAL QUESTIONS
+                                </div>
+                                <div style="font-size: 19px; font-weight: 700; color: #581c87; margin: 2px 0 1px 0;" id="rc-total-questions-card">150</div>
+                                <div style="font-size: 10px; color: #64748b;">Across 3 Subjects</div>
+                            </div>
+
+                            <!-- Correct Answers -->
+                            <div style="border: 1px solid #dcfce7; border-radius: 8px; padding: 6px 10px; background: #f0fdf4;">
+                                <div style="font-size: 9px; font-weight: 600; color: #15803d; text-transform: uppercase;">
+                                    ✔ CORRECT ANSWERS
+                                </div>
+                                <div style="font-size: 19px; font-weight: 700; color: #14532d; margin: 2px 0 1px 0;" id="rc-total-correct">114</div>
+                                <div style="font-size: 10px; color: #64748b;">Across 3 Subjects</div>
+                            </div>
+
+                            <!-- Performance Level -->
+                            <div style="border: 1px solid #ffedd5; border-radius: 8px; padding: 6px 10px; background: #fff7ed;">
+                                <div style="font-size: 9px; font-weight: 600; color: #c2410c; text-transform: uppercase;">
+                                    🏆 PERFORMANCE LEVEL
+                                </div>
+                                <div style="font-size: 17px; font-weight: 700; color: #ea580c; margin: 2px 0 1px 0;" id="rc-overall-level">High</div>
+                                <div style="font-size: 10px; font-weight: 600; color: #d97706;" id="rc-overall-progress-tag">Excellent Progress!</div>
+                            </div>
+
+                            <!-- Performance Level Guide -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 5px 10px; background: #ffffff; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="font-size: 9px; font-weight: 600; color: #475569; margin-bottom: 2px;">Level Guide</div>
+                                <div style="display: flex; flex-direction: column; gap: 1px; font-size: 9.5px; color: #475569;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span><span style="color: #16a34a;">●</span> High</span>
+                                        <span style="color: #64748b;">&ge; 75%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span><span style="color: #f59e0b;">●</span> Medium</span>
+                                        <span style="color: #64748b;">50% - 74%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span><span style="color: #dc2626;">●</span> Low</span>
+                                        <span style="color: #64748b;">&lt; 50%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. SUBJECT & DIFFICULTY LEVEL PERFORMANCE (MERGED & DISTINCT COLOR THEMES) -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                            <div style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.3px;">
+                                SUBJECT &amp; DIFFICULTY LEVEL PERFORMANCE
+                            </div>
+                            <div style="display: flex; gap: 10px; font-size: 9.5px; font-weight: 500; color: #475569;">
+                                <span><span style="color: #16a34a;">●</span> Low (1M)</span>
+                                <span><span style="color: #f59e0b;">●</span> Medium (2M)</span>
+                                <span><span style="color: #dc2626;">●</span> High (3M)</span>
+                            </div>
+                        </div>
+
+                        <!-- 3 Distinct Color-Coded Subject Cards -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                            <!-- English Card (Green Theme) -->
+                            <div style="border: 1px solid #bbf7d0; border-radius: 8px; padding: 8px 10px; background: #ffffff;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #166534;">📖 ENGLISH</div>
+                                    <span id="rc-english-level-badge" style="padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-weight: 600; background: #dcfce7; color: #15803d;">High</span>
+                                </div>
+                                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                                    <span style="font-size: 20px; font-weight: 700; color: #14532d;" id="rc-english-score">80%</span>
+                                    <span style="font-size: 10px; color: #64748b;" id="rc-english-fraction">40 / 50 Correct</span>
+                                </div>
+                                <div style="border-top: 1px dashed #e2e8f0; padding-top: 5px;">
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 3px; font-size: 9px;">
+                                        <div style="background: #f0fdf4; padding: 3px; border-radius: 4px; border: 1px solid #dcfce7;">
+                                            <div style="color: #166534; font-weight: 500;">Low (1M)</div>
+                                            <div style="font-weight: 600; color: #14532d; font-size: 10.5px;" id="rc-english-l1">15/15</div>
+                                        </div>
+                                        <div style="background: #f0fdf4; padding: 3px; border-radius: 4px; border: 1px solid #dcfce7;">
+                                            <div style="color: #166534; font-weight: 500;">Med (2M)</div>
+                                            <div style="font-weight: 600; color: #14532d; font-size: 10.5px;" id="rc-english-l2">18/20</div>
+                                        </div>
+                                        <div style="background: #f0fdf4; padding: 3px; border-radius: 4px; border: 1px solid #dcfce7;">
+                                            <div style="color: #166534; font-weight: 500;">High (3M)</div>
+                                            <div style="font-weight: 600; color: #14532d; font-size: 10.5px;" id="rc-english-l3">7/15</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mathematics Card (Royal Blue Theme) -->
+                            <div style="border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 10px; background: #ffffff;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #1d4ed8;">📐 MATHEMATICS</div>
+                                    <span id="rc-math-level-badge" style="padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-weight: 600; background: #eff6ff; color: #1d4ed8;">Medium</span>
+                                </div>
+                                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                                    <span style="font-size: 20px; font-weight: 700; color: #1e3a8a;" id="rc-math-score">72%</span>
+                                    <span style="font-size: 10px; color: #64748b;" id="rc-math-fraction">36 / 50 Correct</span>
+                                </div>
+                                <div style="border-top: 1px dashed #e2e8f0; padding-top: 5px;">
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 3px; font-size: 9px;">
+                                        <div style="background: #eff6ff; padding: 3px; border-radius: 4px; border: 1px solid #dbeafe;">
+                                            <div style="color: #1d4ed8; font-weight: 500;">Low (1M)</div>
+                                            <div style="font-weight: 600; color: #1e3a8a; font-size: 10.5px;" id="rc-math-l1">15/15</div>
+                                        </div>
+                                        <div style="background: #eff6ff; padding: 3px; border-radius: 4px; border: 1px solid #dbeafe;">
+                                            <div style="color: #1d4ed8; font-weight: 500;">Med (2M)</div>
+                                            <div style="font-weight: 600; color: #1e3a8a; font-size: 10.5px;" id="rc-math-l2">14/20</div>
+                                        </div>
+                                        <div style="background: #eff6ff; padding: 3px; border-radius: 4px; border: 1px solid #dbeafe;">
+                                            <div style="color: #1d4ed8; font-weight: 500;">High (3M)</div>
+                                            <div style="font-weight: 600; color: #1e3a8a; font-size: 10.5px;" id="rc-math-l3">7/15</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Science Card (Deep Purple Theme) -->
+                            <div style="border: 1px solid #e9d5ff; border-radius: 8px; padding: 8px 10px; background: #ffffff;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #7e22ce;">🔬 SCIENCE</div>
+                                    <span id="rc-science-level-badge" style="padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-weight: 600; background: #faf5ff; color: #7e22ce;">High</span>
+                                </div>
+                                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                                    <span style="font-size: 20px; font-weight: 700; color: #581c87;" id="rc-science-score">76%</span>
+                                    <span style="font-size: 10px; color: #64748b;" id="rc-science-fraction">38 / 50 Correct</span>
+                                </div>
+                                <div style="border-top: 1px dashed #e2e8f0; padding-top: 5px;">
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 3px; font-size: 9px;">
+                                        <div style="background: #faf5ff; padding: 3px; border-radius: 4px; border: 1px solid #f3e8ff;">
+                                            <div style="color: #7e22ce; font-weight: 500;">Low (1M)</div>
+                                            <div style="font-weight: 600; color: #581c87; font-size: 10.5px;" id="rc-science-l1">15/15</div>
+                                        </div>
+                                        <div style="background: #faf5ff; padding: 3px; border-radius: 4px; border: 1px solid #f3e8ff;">
+                                            <div style="color: #7e22ce; font-weight: 500;">Med (2M)</div>
+                                            <div style="font-weight: 600; color: #581c87; font-size: 10.5px;" id="rc-science-l2">16/20</div>
+                                        </div>
+                                        <div style="background: #faf5ff; padding: 3px; border-radius: 4px; border: 1px solid #f3e8ff;">
+                                            <div style="color: #7e22ce; font-weight: 500;">High (3M)</div>
+                                            <div style="font-weight: 600; color: #581c87; font-size: 10.5px;" id="rc-science-l3">7/15</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Merged Matrix Table + Level Strength Gauge -->
+                        <div style="display: grid; grid-template-columns: 2.6fr 1fr; gap: 8px;">
+                            <!-- Performance Table -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 10px; text-align: center;">
+                                    <thead>
+                                        <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #475569;">
+                                            <th style="padding: 4px 8px; text-align: left;">Difficulty Level</th>
+                                            <th colspan="2" style="padding: 4px 6px; color: #166534; background: #f0fdf4; border-left: 1px solid #e2e8f0;">ENGLISH</th>
+                                            <th colspan="2" style="padding: 4px 6px; color: #1d4ed8; background: #eff6ff; border-left: 1px solid #e2e8f0;">MATHEMATICS</th>
+                                            <th colspan="2" style="padding: 4px 6px; color: #7e22ce; background: #faf5ff; border-left: 1px solid #e2e8f0;">SCIENCE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rc-performance-level-tbody">
+                                        <!-- Rows rendered dynamically via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Overall Level Strength Donut Gauge -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 8px; background: #ffffff; display: flex; align-items: center; justify-content: space-around;">
+                                <div style="position: relative; width: 48px; height: 48px; flex-shrink: 0;">
+                                    <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                                        <circle cx="18" cy="18" r="14" fill="none" stroke="#22c55e" stroke-width="4.5" stroke-dasharray="30 70" stroke-dashoffset="0"></circle>
+                                        <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" stroke-width="4.5" stroke-dasharray="32 68" stroke-dashoffset="-30"></circle>
+                                        <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" stroke-width="4.5" stroke-dasharray="14 86" stroke-dashoffset="-62"></circle>
+                                    </svg>
+                                    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 700; color: #334155;" id="rc-gauge-total">
+                                        114/150
+                                    </div>
+                                </div>
+                                <div style="font-size: 9.5px; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="color: #166534; font-weight: 600;">● <span id="rc-gauge-l1-pct">100%</span> <span style="font-size: 8.5px; color: #64748b; font-weight: 400;" id="rc-gauge-l1-frac">(45/45)</span></div>
+                                    <div style="color: #c2410c; font-weight: 600;">● <span id="rc-gauge-l2-pct">80%</span> <span style="font-size: 8.5px; color: #64748b; font-weight: 400;" id="rc-gauge-l2-frac">(48/60)</span></div>
+                                    <div style="color: #dc2626; font-weight: 600;">● <span id="rc-gauge-l3-pct">47%</span> <span style="font-size: 8.5px; color: #64748b; font-weight: 400;" id="rc-gauge-l3-frac">(21/45)</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. STRENGTHS | FOCUS AREAS | NEXT STEPS -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                        <!-- STRENGTHS -->
+                        <div style="border: 1px solid #dcfce7; border-radius: 8px; padding: 7px 10px; background: #f0fdf4;">
+                            <div style="font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase; margin-bottom: 4px;">
+                                STRENGTHS
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 3px; font-size: 9.5px; color: #14532d; line-height: 1.3;">
+                                <div>✔ Excellent in Low level questions across all subjects.</div>
+                                <div>✔ Strong in Reading Comprehension &amp; Number Sense.</div>
+                                <div>✔ Consistent performance in Science concepts.</div>
+                            </div>
+                        </div>
+
+                        <!-- FOCUS AREAS -->
+                        <div style="border: 1px solid #ffedd5; border-radius: 8px; padding: 7px 10px; background: #fff7ed;">
+                            <div style="font-size: 10px; font-weight: 700; color: #c2410c; text-transform: uppercase; margin-bottom: 4px;">
+                                FOCUS AREAS
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 3px; font-size: 9.5px; color: #7c2d12; line-height: 1.3;">
+                                <div>⚠️ Improve accuracy in High level questions.</div>
+                                <div>⚠️ Practice Grammar, Division &amp; Science application.</div>
+                                <div>⚠️ Read questions carefully &amp; manage assessment time.</div>
+                            </div>
+                        </div>
+
+                        <!-- NEXT STEPS -->
+                        <div style="border: 1px solid #dbeafe; border-radius: 8px; padding: 7px 10px; background: #eff6ff;">
+                            <div style="font-size: 10px; font-weight: 700; color: #1e40af; text-transform: uppercase; margin-bottom: 4px;">
+                                NEXT STEPS
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 3px; font-size: 9.5px; color: #1e3a8a; line-height: 1.3;">
+                                <div>➔ Practice High level difficulty questions regularly.</div>
+                                <div>➔ Revise weak Learning Objectives through bridge modules.</div>
+                                <div>➔ Take weekly short quizzes and checkpoint mock tests.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. LEVEL GUIDE & NOTE + FOOTER (COMBINED COMPACT STRIP) -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 9.5px; color: #64748b;">
+                        <div>Generated by NorthSouth Foundation</div>
+                        <div id="rc-footer-cycle">SODHANA Assessment 2025-26</div>
+                        <div>Printed on: <span id="rc-printed-date">25 May 2026</span></div>
+                    </div>
+
+                </div>
+
+                <!-- PAGE 2: LEARNING OBJECTIVES -->
+                <div id="report-a4-sheet-2" class="report-a4-sheet" style="max-width: 880px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #334155; line-height: 1.35; page-break-before: always; margin-top: 24px;">
+                    <!-- Minimal header for Page 2 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
+                        <h2 style="font-size: 14px; font-weight: 700; color: #1e3a2f; margin: 0; text-transform: uppercase;">LEARNING OBJECTIVES REPORT</h2>
+                        <div style="font-size: 11px; font-weight: 600; color: #64748b;" id="rc-p2-student-name">A Gamya</div>
+                    </div>
+
+                    <!-- 6. LEARNING OBJECTIVES SUMMARY & SUBJECT SAMPLE TABLES -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                            <div style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.3px;">
+                                LEARNING OBJECTIVES <span style="font-weight: 500; color: #64748b; text-transform: none;">(90 Total &bull; 30 Per Subject)</span>
+                            </div>
+                            <div style="display: flex; gap: 6px; font-size: 9.5px;">
+                                <span style="background: #f0fdf4; border: 1px solid #dcfce7; padding: 1px 6px; border-radius: 4px; color: #166534; font-weight: 600;">Mastered (&ge;80%): <strong id="rc-lo-mastered">46</strong> (<span id="rc-lo-mastered-pct">51%</span>)</span>
+                                <span style="background: #fff7ed; border: 1px solid #ffedd5; padding: 1px 6px; border-radius: 4px; color: #c2410c; font-weight: 600;">Developing (50-79%): <strong id="rc-lo-developing">28</strong> (<span id="rc-lo-developing-pct">31%</span>)</span>
+                                <span style="background: #fef2f2; border: 1px solid #fee2e2; padding: 1px 6px; border-radius: 4px; color: #991b1b; font-weight: 600;">Support (&lt;50%): <strong id="rc-lo-needs-support">16</strong> (<span id="rc-lo-needs-support-pct">18%</span>)</span>
+                            </div>
+                        </div>
+
+                        <!-- 3 Subject Sample Tables -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                            <!-- English LOs -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                <div style="background: #f0fdf4; padding: 4px 8px; font-size: 10px; font-weight: 700; color: #166534; text-align: center; border-bottom: 1px solid #dcfce7;">
+                                    ENGLISH - 30 LOs
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                                    <tbody id="rc-english-lo-body">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Mathematics LOs -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                <div style="background: #eff6ff; padding: 4px 8px; font-size: 10px; font-weight: 700; color: #1e40af; text-align: center; border-bottom: 1px solid #dbeafe;">
+                                    MATHEMATICS - 30 LOs
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                                    <tbody id="rc-math-lo-body">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Science LOs -->
+                            <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                <div style="background: #faf5ff; padding: 4px 8px; font-size: 10px; font-weight: 700; color: #6b21a8; text-align: center; border-bottom: 1px solid #f3e8ff;">
+                                    SCIENCE - 30 LOs
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                                    <tbody id="rc-science-lo-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. LEVEL GUIDE & NOTE + FOOTER (COMBINED COMPACT STRIP) -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 9.5px; color: #64748b;">
+                        <div>Generated by NorthSouth Foundation</div>
+                        <div id="rc-p2-footer-cycle">SODHANA Assessment 2025-26</div>
+                        <div>Printed on: <span id="rc-p2-printed-date">25 May 2026</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // Sample Data
+        // ==========================================
+        const students = [
+            { id: 'S001', name: 'Aarav Sharma', grade: 5, school: 'GPS #1', math: 75, english: 72, science: 78, overall: 75, level: 'Proficient', gap: 'Low' },
+            { id: 'S002', name: 'Anaya Patel', grade: 5, school: 'GPS #1', math: 82, english: 85, science: 80, overall: 82, level: 'Excellent', gap: 'Low' },
+            { id: 'S003', name: 'Arjun Kumar', grade: 5, school: 'GPS #2', math: 35, english: 38, science: 42, overall: 38, level: 'Beginning', gap: 'High' },
+            { id: 'S004', name: 'Diya Singh', grade: 6, school: 'GPS #1', math: 78, english: 75, science: 80, overall: 78, level: 'Proficient', gap: 'Low' },
+            { id: 'S005', name: 'Esha Verma', grade: 6, school: 'GPS #2', math: 45, english: 42, science: 50, overall: 46, level: 'Developing', gap: 'High' },
+            { id: 'S006', name: 'Farhan Khan', grade: 4, school: 'GPS #1', math: 72, english: 68, science: 70, overall: 70, level: 'Proficient', gap: 'Low' },
+            { id: 'S007', name: 'Gita Desai', grade: 7, school: 'GUP #1', math: 88, english: 90, science: 85, overall: 88, level: 'Excellent', gap: 'Low' },
+            { id: 'S008', name: 'Harsh Gupta', grade: 7, school: 'GUP #2', math: 55, english: 52, science: 58, overall: 55, level: 'Developing', gap: 'Medium' },
+            { id: 'S009', name: 'Ishaan Reddy', grade: 3, school: 'GPS #1', math: 80, english: 78, science: 82, overall: 80, level: 'Excellent', gap: 'Low' },
+            { id: 'S010', name: 'Jiya Chopra', grade: 3, school: 'GPS #2', math: 48, english: 52, science: 50, overall: 50, level: 'Developing', gap: 'Medium' },
+            { id: 'S011', name: 'Kabir Ahmed', grade: 8, school: 'GUP #1', math: 70, english: 68, science: 72, overall: 70, level: 'Proficient', gap: 'Low' },
+            { id: 'S012', name: 'Kavya Iyer', grade: 8, school: 'GUP #2', math: 42, english: 38, science: 45, overall: 42, level: 'Beginning', gap: 'High' },
+            { id: 'S013', name: 'Laxmi Nair', grade: 4, school: 'GPS #1', math: 85, english: 82, science: 88, overall: 85, level: 'Excellent', gap: 'Low' },
+            { id: 'S014', name: 'Madhav Rao', grade: 6, school: 'GUP #1', math: 65, english: 62, science: 68, overall: 65, level: 'Proficient', gap: 'Low' },
+            { id: 'S015', name: 'Nisha Roy', grade: 9, school: 'GUP #1', math: 78, english: 75, science: 80, overall: 78, level: 'Proficient', gap: 'Low' },
+            { id: 'S016', name: 'Omprakash Singh', grade: 9, school: 'GUP #3', math: 32, english: 28, science: 35, overall: 32, level: 'Beginning', gap: 'Critical' },
+            { id: 'S017', name: 'Priya Sharma', grade: 10, school: 'GUP #1', math: 88, english: 86, science: 90, overall: 88, level: 'Excellent', gap: 'Low' },
+            { id: 'S018', name: 'Rajesh Kumar', grade: 5, school: 'GPS #1', math: 68, english: 65, science: 70, overall: 68, level: 'Proficient', gap: 'Low' },
+            { id: 'S019', name: 'Shriya Gupta', grade: 7, school: 'GUP #2', math: 58, english: 55, science: 60, overall: 58, level: 'Developing', gap: 'Medium' },
+            { id: 'S020', name: 'Tanvi Mishra', grade: 6, school: 'GPS #2', math: 38, english: 35, science: 40, overall: 38, level: 'Beginning', gap: 'Critical' },
+        ];
+
+        const schools = [
+            { name: 'GPS #1', district: 'Central', students: 185, participation: 98, avgScore: 72.4, gradeLevel: 68, gap: 12 },
+            { name: 'GPS #2', district: 'North', students: 142, participation: 96, avgScore: 65.8, gradeLevel: 58, gap: 22 },
+            { name: 'GPS #3', district: 'South', students: 108, participation: 91, avgScore: 62.1, gradeLevel: 48, gap: 32 },
+            { name: 'GUP #1', district: 'Central', students: 256, participation: 97, avgScore: 68.9, gradeLevel: 62, gap: 18 },
+            { name: 'GUP #2', district: 'East', students: 198, participation: 94, avgScore: 64.5, gradeLevel: 52, gap: 28 },
+            { name: 'GUP #3', district: 'West', students: 122, participation: 88, avgScore: 59.2, gradeLevel: 42, gap: 38 },
+        ];
+
+        // ==========================================
+        // Navigation
+        // ==========================================
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const pageId = item.getAttribute('data-page');
+                showPage(pageId);
+
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        function navigateToPage(pageId) {
+            showPage(pageId);
+            // Update active nav item in sidebar
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                if (nav.getAttribute('data-page') === pageId) {
+                    nav.classList.add('active');
+                } else {
+                    nav.classList.remove('active');
+                }
+            });
+            const contentArea = document.querySelector('.content');
+            if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetEl = document.getElementById(pageId);
+            if (targetEl) targetEl.classList.add('active');
+
+            // Initialize page-specific content
+            if (pageId === 'students') {
+                initStudentPage();
+            } else if (pageId === 'overview') {
+                initOverviewCharts();
+                animateCounters();
+            } else if (pageId === 'performance') {
+                initPerformanceCharts();
+            } else if (pageId === 'subjects') {
+                initSubjectCharts();
+            }
+        }
+
+        function animateCounters() {
+            const counters = document.querySelectorAll('.kpi-counter');
+            counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                const format = counter.getAttribute('data-format') || 'number';
+                if (isNaN(target)) return;
+
+                const duration = 1200; // ms
+                let startTime = null;
+
+                function step(currentTime) {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease Out Expo
+                    const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                    const currentVal = target * easeOut;
+
+                    if (format === 'pct') {
+                        counter.textContent = currentVal.toFixed(1) + '%';
+                    } else if (format === 'comma') {
+                        counter.textContent = Math.round(currentVal).toLocaleString('en-US');
+                    } else {
+                        counter.textContent = Math.round(currentVal);
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        if (format === 'pct') {
+                            counter.textContent = target.toFixed(1) + '%';
+                        } else if (format === 'comma') {
+                            counter.textContent = target.toLocaleString('en-US');
+                        } else {
+                            counter.textContent = target;
+                        }
+                    }
+                }
+                requestAnimationFrame(step);
+            });
+
+            // Animate progress bars
+            const bars = document.querySelectorAll('.participation-bar');
+            bars.forEach(bar => {
+                const targetWidth = bar.getAttribute('data-width') || '96.8%';
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = targetWidth;
+                }, 60);
+            });
+        }
+
+        // ==========================================
+        // Charts
+        // ==========================================
+        let charts = {};
+
+        function initOverviewCharts() {
+            if (charts.subjectChart) return; // Already initialized
+
+            const ctx1 = document.getElementById('subjectChart')?.getContext('2d');
+            if (ctx1) {
+                charts.subjectChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mathematics', 'English', 'Science'],
+                        datasets: [{
+                            label: 'Average Score (%)',
+                            data: [68.9, 67.8, 68.4],
+                            backgroundColor: ['#1d4ed8', '#16a34a', '#7e22ce'],
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: undefined,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, max: 100 }
+                        }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('gradeChart')?.getContext('2d');
+            if (ctx2) {
+                charts.gradeChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                        datasets: [{
+                            label: 'Average Score',
+                            data: [71.2, 69.8, 68.4, 67.2, 66.8, 68.1, 67.5, 69.2],
+                            borderColor: '#347363',
+                            backgroundColor: 'rgba(52, 115, 99, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#347363'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+
+            const ctx3 = document.getElementById('levelsChart')?.getContext('2d');
+            if (ctx3) {
+                charts.levelsChart = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Excellent', 'Proficient', 'Developing', 'Beginning'],
+                        datasets: [{
+                            data: [35, 39, 19, 7],
+                            backgroundColor: ['#16a34a', '#2563eb', '#f59e0b', '#dc2626'],
+                            borderRadius: 8,
+                            borderWidth: 3,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            const ctx4 = document.getElementById('schoolChart')?.getContext('2d');
+            if (ctx4) {
+                charts.schoolChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: ['GPS #1', 'GPS #2', 'GPS #3', 'GUP #1', 'GUP #2', 'GUP #3'],
+                        datasets: [{
+                            label: 'Average Score',
+                            data: [72.4, 65.8, 62.1, 68.9, 64.5, 59.2],
+                            backgroundColor: (context) => {
+                                const value = context.raw;
+                                if (value >= 70) return '#16a34a';
+                                if (value >= 65) return '#2563eb';
+                                if (value >= 60) return '#f59e0b';
+                                return '#dc2626';
+                            },
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+        }
+
+        function initPerformanceCharts() {
+            if (charts.performanceSubjectChart) return;
+
+            const ctx1 = document.getElementById('performanceSubjectChart')?.getContext('2d');
+            if (ctx1) {
+                charts.performanceSubjectChart = new Chart(ctx1, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
+                        datasets: [
+                            {
+                                label: 'Mathematics',
+                                data: [72, 70, 68, 67, 66, 69],
+                                borderColor: '#1d4ed8',
+                                backgroundColor: 'rgba(29, 78, 216, 0.15)'
+                            },
+                            {
+                                label: 'English',
+                                data: [71, 68, 69, 68, 67, 67],
+                                borderColor: '#16a34a',
+                                backgroundColor: 'rgba(22, 163, 74, 0.15)'
+                            },
+                            {
+                                label: 'Science',
+                                data: [71, 71, 69, 67, 68, 68],
+                                borderColor: '#7e22ce',
+                                backgroundColor: 'rgba(126, 34, 206, 0.15)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('performanceGradeChart')?.getContext('2d');
+            if (ctx2) {
+                charts.performanceGradeChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                        datasets: [
+                            {
+                                label: 'Excellent',
+                                data: [48, 42, 38, 35, 33, 36, 34, 40],
+                                backgroundColor: '#16a34a'
+                            },
+                            {
+                                label: 'Proficient',
+                                data: [40, 42, 40, 42, 44, 42, 44, 42],
+                                backgroundColor: '#2563eb'
+                            },
+                            {
+                                label: 'Developing',
+                                data: [8, 12, 16, 19, 18, 17, 18, 14],
+                                backgroundColor: '#f59e0b'
+                            },
+                            {
+                                label: 'Beginning',
+                                data: [4, 4, 6, 4, 5, 5, 4, 4],
+                                backgroundColor: '#dc2626'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true }, y: { stacked: true } },
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        }
+
+        function initSubjectCharts() {
+            if (charts.mathChart) return;
+
+            const ctx1 = document.getElementById('mathChart')?.getContext('2d');
+            if (ctx1) {
+                charts.mathChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                        datasets: [{
+                            label: 'Mathematics Score',
+                            data: [72.1, 70.4, 67.8, 66.5, 65.9, 69.2, 68.1, 70.1],
+                            backgroundColor: '#1d4ed8',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('englishChart')?.getContext('2d');
+            if (ctx2) {
+                charts.englishChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                        datasets: [{
+                            label: 'English Score',
+                            data: [70.8, 68.2, 68.9, 67.8, 67.2, 67.4, 66.8, 68.5],
+                            backgroundColor: '#16a34a',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+
+            const ctx3 = document.getElementById('scienceChart')?.getContext('2d');
+            if (ctx3) {
+                charts.scienceChart = new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                        datasets: [{
+                            label: 'Science Score',
+                            data: [70.7, 70.8, 68.5, 67.3, 67.3, 67.7, 67.6, 69.0],
+                            backgroundColor: '#7e22ce',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // Student Page
+        // ==========================================
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function initStudentPage() {
+            renderStudentTable();
+            setupPagination();
+
+            const searchInput = document.getElementById('studentSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterStudents);
+            }
+        }
+
+        function renderStudentTable() {
+            const tbody = document.getElementById('studentTableBody');
+            if (!tbody) return;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageStudents = students.slice(start, end);
+
+            tbody.innerHTML = pageStudents.map(student => `
+                <tr class="clickable-row" onclick="openStudentModal(${JSON.stringify(student).replace(/"/g, '&quot;')})">
+                    <td>${student.id}</td>
+                    <td><strong>${student.name}</strong></td>
+                    <td>${student.grade}</td>
+                    <td>${student.school}</td>
+                    <td>${student.math}%</td>
+                    <td>${student.english}%</td>
+                    <td>${student.science}%</td>
+                    <td><strong>${student.overall}%</strong></td>
+                    <td><span class="performance-level performance-${getPerformanceClass(student.level)}">${student.level}</span></td>
+                    <td><span class="gap-indicator gap-${student.gap.toLowerCase()}"></span>${student.gap}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getPerformanceClass(level) {
+            const map = {
+                'Excellent': 'excellent',
+                'Proficient': 'proficient',
+                'Developing': 'developing',
+                'Beginning': 'beginning'
+            };
+            return map[level] || 'proficient';
+        }
+
+        function setupPagination() {
+            const pagination = document.getElementById('studentPagination');
+            if (!pagination) return;
+
+            const totalPages = Math.ceil(students.length / itemsPerPage);
+            let html = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button ${i === currentPage ? 'class="active"' : ''} onclick="goToPage(${i})">${i}</button>`;
+            }
+
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderStudentTable();
+            setupPagination();
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('studentSearch').value.toLowerCase();
+            const filtered = students.filter(s =>
+                s.name.toLowerCase().includes(query) ||
+                s.id.toLowerCase().includes(query)
+            );
+
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = filtered.map(student => `
+                <tr class="clickable-row" onclick="openStudentModal(${JSON.stringify(student).replace(/"/g, '&quot;')})">
+                    <td>${student.id}</td>
+                    <td><strong>${student.name}</strong></td>
+                    <td>${student.grade}</td>
+                    <td>${student.school}</td>
+                    <td>${student.math}%</td>
+                    <td>${student.english}%</td>
+                    <td>${student.science}%</td>
+                    <td><strong>${student.overall}%</strong></td>
+                    <td><span class="performance-level performance-${getPerformanceClass(student.level)}">${student.level}</span></td>
+                    <td><span class="gap-indicator gap-${student.gap.toLowerCase()}"></span>${student.gap}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ==========================================
+        // Executive Student Report Card & Modal
+        // ==========================================
+        let currentReportStudent = null;
+
+        function openStudentModal(student) {
+            openReportModal(student);
+        }
+
+        function openReportModal(studentOrId) {
+            let student = studentOrId;
+            if (typeof studentOrId === 'string') {
+                student = students.find(s => s.id === studentOrId) || students[0];
+            }
+            if (!student) return;
+            currentReportStudent = student;
+
+            const modal = document.getElementById('report-modal');
+            if (!modal) return;
+
+            // Populate Student Picker Dropdown in Top Bar
+            const picker = document.getElementById('report-modal-student-picker');
+            if (picker) {
+                picker.innerHTML = students.map(s => 
+                    `<option value="${s.id}" ${s.id === student.id ? 'selected' : ''}>${s.name} (${s.id} - Grade ${s.grade})</option>`
+                ).join('');
+            }
+
+            // Sync Assessment Cycle from Header Dropdown
+            const cycleSelect = document.getElementById('cycleSelect');
+            const cycleName = cycleSelect ? cycleSelect.value.trim() : 'SODHANA';
+            const yearSelect = document.querySelector('.filter-group select');
+            const yearText = yearSelect ? yearSelect.value : '2025-26';
+            const yearMatch = yearText.match(/\d{4}-\d{2}/) || ['2025-26'];
+            const yearVal = yearMatch[0];
+            const fullCycleText = `${cycleName} Assessment ${yearVal}`;
+
+            const cycleEl = document.getElementById('rc-assessment-cycle');
+            if (cycleEl) cycleEl.textContent = fullCycleText;
+            const footerCycleEl = document.getElementById('rc-footer-cycle');
+            if (footerCycleEl) footerCycleEl.textContent = fullCycleText;
+
+            const printDateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const printDateEl = document.getElementById('rc-printed-date');
+            if (printDateEl) printDateEl.textContent = printDateStr;
+
+            // 1. Student Metadata Bar
+            const studentNameStr = student.name || 'A Gamya';
+            const studentGradeStr = `Grade ${student.grade || 6} - Section C`;
+            const studentIdStr = student.id ? (student.id.startsWith('S') ? '815370' + student.id.replace('S', '0') : student.id) : '8153700340';
+            const studentSchoolStr = student.school ? (student.school.includes('GPS') || student.school.includes('GUP') ? student.school + ', District Central' : student.school) : 'Global Edge, Madhapur';
+
+            document.getElementById('rc-student-name').textContent = studentNameStr;
+            document.getElementById('rc-student-grade').textContent = studentGradeStr;
+            document.getElementById('rc-student-id').textContent = studentIdStr;
+            document.getElementById('rc-student-school').textContent = studentSchoolStr;
+            document.getElementById('rc-assessment-date').textContent = printDateStr;
+
+            // 2. Score Calculations
+            const engTotal = 50;
+            const mathTotal = 50;
+            const sciTotal = 50;
+            const totalQs = engTotal + mathTotal + sciTotal;
+
+            const engCorrect = Math.min(engTotal, Math.max(5, Math.round(student.english * 0.5)));
+            const mathCorrect = Math.min(mathTotal, Math.max(5, Math.round(student.math * 0.5)));
+            const sciCorrect = Math.min(sciTotal, Math.max(5, Math.round(student.science * 0.5)));
+            const totalCorrect = engCorrect + mathCorrect + sciCorrect;
+            const overallPct = Math.round((totalCorrect / totalQs) * 100);
+
+            document.getElementById('rc-overall-score').textContent = `${overallPct}%`;
+            document.getElementById('rc-overall-fraction').textContent = `${totalCorrect} / ${totalQs} Correct`;
+            document.getElementById('rc-total-correct').textContent = totalCorrect;
+
+            // Level & Guide helper
+            const getLevelDetails = (score) => {
+                if (score >= 75) return { label: 'High', color: '#16a34a', bg: '#dcfce7', tag: 'Excellent Progress!' };
+                if (score >= 50) return { label: 'Medium', color: '#ea580c', bg: '#ffedd5', tag: 'Consistent Progress' };
+                return { label: 'Low', color: '#dc2626', bg: '#fee2e2', tag: 'Needs Targeted Support' };
+            };
+
+            const overallLevel = getLevelDetails(overallPct);
+            const engLevel = getLevelDetails(student.english);
+            const mathLevel = getLevelDetails(student.math);
+            const sciLevel = getLevelDetails(student.science);
+
+            const lvlEl = document.getElementById('rc-overall-level');
+            lvlEl.textContent = overallLevel.label;
+            lvlEl.style.color = overallLevel.color;
+            const tagEl = document.getElementById('rc-overall-progress-tag');
+            tagEl.textContent = overallLevel.tag;
+            tagEl.style.color = overallLevel.color;
+
+            // 3. Subject Cards (English: Green, Math: Royal Blue, Science: Purple)
+            // English
+            document.getElementById('rc-english-score').textContent = `${student.english}%`;
+            document.getElementById('rc-english-fraction').textContent = `${engCorrect} / ${engTotal} Correct`;
+            const engBadge = document.getElementById('rc-english-level-badge');
+            engBadge.textContent = engLevel.label;
+            engBadge.style.color = engLevel.color;
+            engBadge.style.background = engLevel.bg;
+
+            // Math
+            document.getElementById('rc-math-score').textContent = `${student.math}%`;
+            document.getElementById('rc-math-fraction').textContent = `${mathCorrect} / ${mathTotal} Correct`;
+            const mathBadge = document.getElementById('rc-math-level-badge');
+            mathBadge.textContent = mathLevel.label;
+            mathBadge.style.color = mathLevel.color;
+            mathBadge.style.background = mathLevel.bg;
+
+            // Science
+            document.getElementById('rc-science-score').textContent = `${student.science}%`;
+            document.getElementById('rc-science-fraction').textContent = `${sciCorrect} / ${sciTotal} Correct`;
+            const sciBadge = document.getElementById('rc-science-level-badge');
+            sciBadge.textContent = sciLevel.label;
+            sciBadge.style.color = sciLevel.color;
+            sciBadge.style.background = sciLevel.bg;
+
+            // Difficulty breakdowns per subject
+            const calcDiff = (score) => {
+                const ratio = score / 100;
+                const l1 = Math.min(15, Math.max(5, Math.round(15 * Math.min(1, ratio * 1.25))));
+                const l2 = Math.min(20, Math.max(5, Math.round(20 * ratio)));
+                const l3 = Math.min(15, Math.max(2, Math.round(15 * ratio * 0.65)));
+                const l1Pct = Math.round((l1 / 15) * 100);
+                const l2Pct = Math.round((l2 / 20) * 100);
+                const l3Pct = Math.round((l3 / 15) * 100);
+                return { l1, l2, l3, l1Pct, l2Pct, l3Pct };
+            };
+
+            const eDiff = calcDiff(student.english);
+            const mDiff = calcDiff(student.math);
+            const sDiff = calcDiff(student.science);
+
+            document.getElementById('rc-english-l1').textContent = `${eDiff.l1}/15`;
+            document.getElementById('rc-english-l2').textContent = `${eDiff.l2}/20`;
+            document.getElementById('rc-english-l3').textContent = `${eDiff.l3}/15`;
+
+            document.getElementById('rc-math-l1').textContent = `${mDiff.l1}/15`;
+            document.getElementById('rc-math-l2').textContent = `${mDiff.l2}/20`;
+            document.getElementById('rc-math-l3').textContent = `${mDiff.l3}/15`;
+
+            document.getElementById('rc-science-l1').textContent = `${sDiff.l1}/15`;
+            document.getElementById('rc-science-l2').textContent = `${sDiff.l2}/20`;
+            document.getElementById('rc-science-l3').textContent = `${sDiff.l3}/15`;
+
+            // 4. Merged Performance Table Rows
+            const formatPctCell = (val, max) => {
+                const pct = Math.round((val / max) * 100);
+                const color = pct >= 75 ? '#16a34a' : (pct >= 50 ? '#d97706' : '#dc2626');
+                return `<span style="color:${color}; font-weight:600;">${pct}%</span>`;
+            };
+
+            const perfTbody = document.getElementById('rc-performance-level-tbody');
+            if (perfTbody) {
+                perfTbody.innerHTML = `
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 3.5px 8px; text-align: left; font-weight: 500;">
+                            <span style="color: #16a34a; font-size: 11px;">●</span> Low (1M)
+                        </td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #166534; border-left: 1px solid #f1f5f9;">${eDiff.l1} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(eDiff.l1, 15)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #1d4ed8; border-left: 1px solid #f1f5f9;">${mDiff.l1} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(mDiff.l1, 15)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #7e22ce; border-left: 1px solid #f1f5f9;">${sDiff.l1} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(sDiff.l1, 15)}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 3.5px 8px; text-align: left; font-weight: 500;">
+                            <span style="color: #f59e0b; font-size: 11px;">●</span> Med (2M)
+                        </td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #166534; border-left: 1px solid #f1f5f9;">${eDiff.l2} / 20</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(eDiff.l2, 20)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #1d4ed8; border-left: 1px solid #f1f5f9;">${mDiff.l2} / 20</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(mDiff.l2, 20)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #7e22ce; border-left: 1px solid #f1f5f9;">${sDiff.l2} / 20</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(sDiff.l2, 20)}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 3.5px 8px; text-align: left; font-weight: 500;">
+                            <span style="color: #dc2626; font-size: 11px;">●</span> High (3M)
+                        </td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #166534; border-left: 1px solid #f1f5f9;">${eDiff.l3} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(eDiff.l3, 15)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #1d4ed8; border-left: 1px solid #f1f5f9;">${mDiff.l3} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(mDiff.l3, 15)}</td>
+                        <td style="padding: 3.5px 4px; font-weight: 600; color: #7e22ce; border-left: 1px solid #f1f5f9;">${sDiff.l3} / 15</td>
+                        <td style="padding: 3.5px 4px;">${formatPctCell(sDiff.l3, 15)}</td>
+                    </tr>
+                    <tr style="background: #fafafa; font-weight: 600;">
+                        <td style="padding: 4px 8px; text-align: left; color: #0f172a;">Total</td>
+                        <td style="padding: 4px 4px; color: #166534; border-left: 1px solid #f1f5f9;">${engCorrect} / ${engTotal}</td>
+                        <td style="padding: 4px 4px;">${formatPctCell(engCorrect, engTotal)}</td>
+                        <td style="padding: 4px 4px; color: #1d4ed8; border-left: 1px solid #f1f5f9;">${mathCorrect} / ${mathTotal}</td>
+                        <td style="padding: 4px 4px;">${formatPctCell(mathCorrect, mathTotal)}</td>
+                        <td style="padding: 4px 4px; color: #7e22ce; border-left: 1px solid #f1f5f9;">${sciCorrect} / ${sciTotal}</td>
+                        <td style="padding: 4px 4px;">${formatPctCell(sciCorrect, sciTotal)}</td>
+                    </tr>
+                `;
+            }
+
+            // Donut Gauge updates
+            const l1TotalCorrect = eDiff.l1 + mDiff.l1 + sDiff.l1;
+            const l2TotalCorrect = eDiff.l2 + mDiff.l2 + sDiff.l2;
+            const l3TotalCorrect = eDiff.l3 + mDiff.l3 + sDiff.l3;
+
+            const l1Pct = Math.round((l1TotalCorrect / 45) * 100);
+            const l2Pct = Math.round((l2TotalCorrect / 60) * 100);
+            const l3Pct = Math.round((l3TotalCorrect / 45) * 100);
+
+            const gaugeTotal = document.getElementById('rc-gauge-total');
+            if (gaugeTotal) gaugeTotal.textContent = `${totalCorrect}/${totalQs}`;
+
+            const gL1Pct = document.getElementById('rc-gauge-l1-pct');
+            if (gL1Pct) gL1Pct.textContent = `${l1Pct}%`;
+            const gL1Frac = document.getElementById('rc-gauge-l1-frac');
+            if (gL1Frac) gL1Frac.textContent = `(${l1TotalCorrect}/45)`;
+
+            const gL2Pct = document.getElementById('rc-gauge-l2-pct');
+            if (gL2Pct) gL2Pct.textContent = `${l2Pct}%`;
+            const gL2Frac = document.getElementById('rc-gauge-l2-frac');
+            if (gL2Frac) gL2Frac.textContent = `(${l2TotalCorrect}/60)`;
+
+            const gL3Pct = document.getElementById('rc-gauge-l3-pct');
+            if (gL3Pct) gL3Pct.textContent = `${l3Pct}%`;
+            const gL3Frac = document.getElementById('rc-gauge-l3-frac');
+            if (gL3Frac) gL3Frac.textContent = `(${l3TotalCorrect}/45)`;
+
+            // 5. Learning Objectives Summary (90 LOs total)
+            const masteredCount = Math.round(90 * (student.overall >= 75 ? 0.51 : student.overall >= 50 ? 0.35 : 0.18));
+            const developingCount = Math.round(90 * (student.overall >= 75 ? 0.31 : student.overall >= 50 ? 0.45 : 0.38));
+            const needsSupportCount = 90 - masteredCount - developingCount;
+
+            document.getElementById('rc-lo-mastered').textContent = masteredCount;
+            document.getElementById('rc-lo-mastered-pct').textContent = `${Math.round((masteredCount / 90) * 100)}%`;
+            document.getElementById('rc-lo-developing').textContent = developingCount;
+            document.getElementById('rc-lo-developing-pct').textContent = `${Math.round((developingCount / 90) * 100)}%`;
+            document.getElementById('rc-lo-needs-support').textContent = needsSupportCount;
+            document.getElementById('rc-lo-needs-support-pct').textContent = `${Math.round((needsSupportCount / 90) * 100)}%`;
+
+            // Open Modal
+            modal.classList.remove('hidden');
+            const scroll = document.getElementById('report-modal-scroll');
+            if (scroll) scroll.scrollTop = 0;
+            
+            // Generate 30 LOs per subject dynamically
+            const generateLORows = (baseScore, loPrefix) => {
+                let rows = '';
+                for (let i = 1; i <= 30; i++) {
+                    const variance = (Math.random() * 20 - 10);
+                    let loScore = Math.min(100, Math.max(0, Math.round(baseScore + variance)));
+                    let color = loScore >= 80 ? '#16a34a' : (loScore >= 50 ? '#f59e0b' : '#dc2626');
+                    
+                    rows += `
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 3px 6px;">LO ${i}: ${loPrefix} Objective ${i}</td>
+                            <td style="padding: 3px 4px; text-align: center; font-weight: 600; color: ${color};">${loScore}%</td>
+                            <td style="padding: 3px 4px; text-align: center;"><span style="color: ${color};">●</span></td>
+                        </tr>
+                    `;
+                }
+                return rows;
+            };
+
+            const engBody = document.getElementById('rc-english-lo-body');
+            if (engBody) engBody.innerHTML = generateLORows(student.english, 'English');
+            
+            const mathBody = document.getElementById('rc-math-lo-body');
+            if (mathBody) mathBody.innerHTML = generateLORows(student.math, 'Math');
+            
+            const sciBody = document.getElementById('rc-science-lo-body');
+            if (sciBody) sciBody.innerHTML = generateLORows(student.science, 'Science');
+
+            // Set Page 2 Student Name and Footer
+            const p2StudentName = document.getElementById('rc-p2-student-name');
+            if (p2StudentName) p2StudentName.textContent = studentNameStr;
+            const p2FooterCycle = document.getElementById('rc-p2-footer-cycle');
+            if (p2FooterCycle) p2FooterCycle.textContent = fullCycleText;
+            const p2PrintedDate = document.getElementById('rc-p2-printed-date');
+            if (p2PrintedDate) p2PrintedDate.textContent = printDateStr;
+        }
+
+        function onReportStudentPicked(studentId) {
+            openReportModal(studentId);
+        }
+
+        function closeReportModal() {
+            const modal = document.getElementById('report-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+        }
+
+        window.addEventListener('click', (e) => {
+            const reportModal = document.getElementById('report-modal');
+            if (e.target === reportModal) closeReportModal();
+        });
+
+        // ==========================================
+        // Reports Generation
+        // ==========================================
+        function generateReport(reportType) {
+            if (reportType === 'student') {
+                openReportModal(students[0].id);
+                return;
+            }
+
+            const reportContent = getReportContent(reportType);
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Sodhana Assessment Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
+                        h1 { color: #347363; border-bottom: 3px solid #ff751f; padding-bottom: 10px; }
+                        h2 { color: #347363; margin-top: 30px; margin-bottom: 15px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background: #f8fafb; font-weight: bold; }
+                        .meta { color: #666; font-size: 12px; margin-bottom: 20px; }
+                        .section { margin-bottom: 30px; }
+                        .highlight { background: #f8fafb; padding: 15px; border-left: 4px solid #ff751f; margin: 15px 0; }
+                    </style>
+                </head>
+                <body>
+                    \${reportContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+function getReportContent(type) {
+            const now = new Date().toLocaleDateString();
+
+            if (type === 'student') {
+                const student = students[0];
+                return `
+                    <h1>📋 Individual Student Report</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>Student Information</h2>
+                        <table>
+                            <tr><td>Student ID</td><td>${student.id}</td></tr>
+                            <tr><td>Name</td><td>${student.name}</td></tr>
+                            <tr><td>Grade</td><td>${student.grade}</td></tr>
+                            <tr><td>School</td><td>${student.school}</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Assessment Results</h2>
+                        <table>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Score (%)</th>
+                                <th>Performance Level</th>
+                            </tr>
+                            <tr><td>Mathematics</td><td>${student.math}</td><td>${student.level}</td></tr>
+                            <tr><td>English</td><td>${student.english}</td><td>${student.level}</td></tr>
+                            <tr><td>Science</td><td>${student.science}</td><td>${student.level}</td></tr>
+                            <tr style="background: #f0f8ff;"><td><strong>Overall</strong></td><td><strong>${student.overall}%</strong></td><td><strong>${student.level}</strong></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Recommendation:</strong> ${student.overall >= 80 ? 'Excellent performance. Provide enrichment opportunities.' : student.overall >= 60 ? 'Good performance. Continue current support.' : 'Below grade level. Intensive support required.'}
+                    </div>
+                `;
+            } else if (type === 'school') {
+                const school = schools[0];
+                return `
+                    <h1>🏫 School Performance Report</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>School Summary</h2>
+                        <table>
+                            <tr><td>School Name</td><td>${school.name}</td></tr>
+                            <tr><td>District</td><td>${school.district}</td></tr>
+                            <tr><td>Students Assessed</td><td>${school.students}</td></tr>
+                            <tr><td>Participation Rate</td><td>${school.participation}%</td></tr>
+                            <tr style="background: #f0f8ff;"><td><strong>Average Score</strong></td><td><strong>${school.avgScore}%</strong></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Performance Metrics</h2>
+                        <table>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr><td>Grade Level Achievement %</td><td>${school.gradeLevel}%</td></tr>
+                            <tr><td>Learning Gap %</td><td>${school.gap}%</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Overall Assessment:</strong> The school shows ${school.avgScore >= 70 ? 'strong' : school.avgScore >= 60 ? 'average' : 'below average'} performance with ${school.gap}% learning gap.
+                    </div>
+                `;
+            } else if (type === 'principal') {
+                return `
+                    <h1>👨‍💼 Principal Executive Summary</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>Key Metrics</h2>
+                        <table>
+                            <tr><td>Total Students Assessed</td><td>2,756 (96.8%)</td></tr>
+                            <tr><td>Average Score</td><td>68.4%</td></tr>
+                            <tr><td>Students Below Grade Level</td><td>356 (12.9%)</td></tr>
+                            <tr><td>Critical Learning Gaps</td><td>24</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Priority Interventions</h2>
+                        <ol>
+                            <li><strong>Mathematics - Fractions (Grade 5):</strong> 286 students | Gap: 45%</li>
+                            <li><strong>English - Comprehension (Grade 6):</strong> 234 students | Gap: 38%</li>
+                            <li><strong>Below Grade Level Support:</strong> 356 students across all grades</li>
+                        </ol>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Recommendation:</strong> Implement targeted remediation programs with focus on foundational skills in Mathematics and English.
+                    </div>
+                `;
+            } else if (type === 'grade') {
+                return `
+                    <h1>📊 Grade-wise Report</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>Performance by Grade</h2>
+                        <table>
+                            <tr>
+                                <th>Grade</th>
+                                <th>Students</th>
+                                <th>Avg Score</th>
+                                <th>Below Grade %</th>
+                            </tr>
+                            <tr><td>Grade 3</td><td>312</td><td>71.2%</td><td>8%</td></tr>
+                            <tr><td>Grade 4</td><td>298</td><td>69.8%</td><td>11%</td></tr>
+                            <tr><td>Grade 5</td><td>287</td><td>68.4%</td><td>13%</td></tr>
+                            <tr><td>Grade 6</td><td>315</td><td>67.2%</td><td>14%</td></tr>
+                            <tr><td>Grade 7</td><td>304</td><td>66.8%</td><td>15%</td></tr>
+                            <tr><td>Grade 8</td><td>318</td><td>68.1%</td><td>12%</td></tr>
+                            <tr><td>Grade 9</td><td>296</td><td>67.5%</td><td>14%</td></tr>
+                            <tr><td>Grade 10</td><td>226</td><td>69.2%</td><td>10%</td></tr>
+                        </table>
+                    </div>
+                `;
+            } else if (type === 'gaps') {
+                return `
+                    <h1>⚠️ Learning Gap Report</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>Top 5 Critical Gaps</h2>
+                        <table>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Competency</th>
+                                <th>Gap %</th>
+                                <th>Students Affected</th>
+                            </tr>
+                            <tr><td>Mathematics</td><td>Fractions - Division</td><td>45%</td><td>286</td></tr>
+                            <tr><td>English</td><td>Comprehension - Inference</td><td>38%</td><td>234</td></tr>
+                            <tr><td>Science</td><td>Photosynthesis</td><td>34%</td><td>198</td></tr>
+                            <tr><td>Mathematics</td><td>Decimals - Addition</td><td>32%</td><td>176</td></tr>
+                            <tr><td>English</td><td>Grammar - Tenses</td><td>28%</td><td>142</td></tr>
+                        </table>
+                    </div>
+                `;
+            } else {
+                return `
+                    <h1>🎯 Intervention Plan</h1>
+                    <div class="meta">Generated: ${now} | Assessment Cycle: Mid-term 2024-25</div>
+
+                    <div class="section">
+                        <h2>HIGH PRIORITY Interventions</h2>
+                        <ul>
+                            <li>Mathematics Fractions Program (286 students)</li>
+                            <li>English Comprehension Workshop (234 students)</li>
+                            <li>School-Level Support - GUP #3 (122 students)</li>
+                        </ul>
+                    </div>
+
+                    <div class="section">
+                        <h2>MEDIUM PRIORITY Interventions</h2>
+                        <ul>
+                            <li>Science Concept Reinforcement (198 students)</li>
+                            <li>Mathematics Decimal Practice (176 students)</li>
+                            <li>English Grammar Sessions (142 students)</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        
+
+        // ==========================================
+        // Initialize & Login
+        // ==========================================
+        const loginScreen = document.getElementById('login-screen');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const user = document.getElementById('login-username').value.trim().toLowerCase();
+                const pass = document.getElementById('login-password').value.trim();
+                const validUser = 'admin';
+                const validPass = 'admin123';
+
+                if (user === validUser && pass === validPass) {
+                    loginScreen.style.display = 'none';
+                    animateCounters();
+                } else {
+                    loginError.textContent = 'Incorrect username or password. (Note: username is admin, password is admin123)';
+                    loginError.classList.remove('hidden');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initOverviewCharts();
+            animateCounters();
+        });
+    </script>
+</body>
+</html>
