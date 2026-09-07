@@ -1119,6 +1119,7 @@
                     <div id="gaps-questions-view" class="gaps-subview">
                         <div class="filter-group mb-4">
                             <select class="filter-select" id="questionSubjectFilter" onchange="renderQuestionsTable()">
+                                <option value="">All Subjects (150 Questions)</option>
                                 <option value="Mathematics">Mathematics (50 Questions)</option>
                                 <option value="English">English (50 Questions)</option>
                                 <option value="Science">Science (50 Questions)</option>
@@ -2713,14 +2714,20 @@
             const subject = subSelect ? subSelect.value : 'Mathematics';
             const diffFilter = diffSelect ? diffSelect.value : '';
 
-            const allQs = generateQuestionsData(subject);
+            let allQs = [];
+            if (subject === '') {
+                // All Subjects - combine all three
+                allQs = [...generateQuestionsData('Mathematics'), ...generateQuestionsData('English'), ...generateQuestionsData('Science')];
+            } else {
+                allQs = generateQuestionsData(subject);
+            }
             const filtered = diffFilter ? allQs.filter(q => q.diff === diffFilter) : allQs;
 
             const titleEl = document.getElementById('questionsTableTitle');
-            if (titleEl) titleEl.textContent = `${subject} - 50 Assessment Questions`;
+            if (titleEl) titleEl.textContent = subject === '' ? 'All Subjects - 150 Assessment Questions' : `${subject} - 50 Assessment Questions`;
 
             const badgeEl = document.getElementById('questionsCountBadge');
-            if (badgeEl) badgeEl.textContent = `Showing ${filtered.length} of 50 Questions`;
+            if (badgeEl) badgeEl.textContent = `Showing ${filtered.length} of ${subject === '' ? '150' : '50'} Questions`;
 
             const tbody = document.getElementById('questionsTableBody');
             if (!tbody) return;
