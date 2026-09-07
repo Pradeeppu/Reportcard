@@ -642,7 +642,7 @@
                 <img src="northsouth-logo.jpg" alt="NorthSouth / Global Edge"
                     class="h-16 w-auto rounded-lg shadow-sm bg-white p-1 mb-2.5">
                 <h1 class="text-xl font-bold text-gray-800 text-center">The Global Edge School</h1>
-                <p class="text-xs text-gray-500 text-center mt-1">SODHANA Diagnostic Assessment & Analytics Portal</p>
+                <p class="text-xs text-gray-500 text-center mt-1">SODHANA Assessment & Analytics Portal</p>
             </div>
             <form id="login-form" class="space-y-4">
                 <div>
@@ -695,15 +695,11 @@
                 </div>
                 <div class="nav-item" data-page="gaps">
                     <span class="nav-icon">⚠️</span>
-                    <span>Learning Gaps</span>
+                    <span>Learning Gaps & Questions</span>
                 </div>
                 <div class="nav-item" data-page="subjects">
                     <span class="nav-icon">📚</span>
                     <span>Subjects</span>
-                </div>
-                <div class="nav-item" data-page="questions">
-                    <span class="nav-icon">❓</span>
-                    <span>Questions</span>
                 </div>
                 <div class="nav-item" data-page="students">
                     <span class="nav-icon">👥</span>
@@ -729,7 +725,7 @@
             <!-- Header -->
             <div class="header">
                 <div class="header-title">
-                    <span>Sodhana Diagnostic Assessment</span>
+                    <span>Sodhana Assessment</span>
                     <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded border border-emerald-300">Live Analytics</span>
                 </div>
                 <div class="header-right">
@@ -759,7 +755,7 @@
                 <div id="overview" class="page active">
                     <div class="page-header">
                         <h2>Executive Assessment Overview</h2>
-                        <p>Real-time diagnostic analytics across Jindal group of schools</p>
+                        <p>Real-time analytics across school branches</p>
                     </div>
 
                     <!-- KPI Cards -->
@@ -769,7 +765,7 @@
                                 <div class="kpi-label">👥 Students Assessed</div>
                                 <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span class="kpi-counter" data-target="96.8" data-format="pct">96.8%</span> Turnout
+                                    <span class="kpi-counter" data-target="96.8" data-format="pct">96.8%</span> Participation
                                 </span>
                             </div>
                             <div class="flex items-baseline gap-2">
@@ -783,7 +779,7 @@
                                 <span class="kpi-change">↑ 12% vs last term</span>
                                 <span class="text-[11px] text-gray-400">91 Absent (3.2%)</span>
                             </div>
-                            <div class="kpi-action-hint">View School, Grade & Section Turnout →</div>
+                            <div class="kpi-action-hint">View School, Grade & Section Participation →</div>
                         </div>
 
                         <div class="kpi-card success" onclick="navigateToPage('performance')" title="Click to view Performance Breakdown">
@@ -798,7 +794,7 @@
 
                         <div class="kpi-card warning" onclick="navigateToPage('interventions')" title="Click to view Remediation Support Plans">
                             <div class="flex items-center justify-between mb-1.5">
-                                <div class="kpi-label">⚠️ Below Grade Level</div>
+                                <div class="kpi-label">⚠️ Remediation Needed</div>
                                 <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Target Support</span>
                             </div>
                             <div class="kpi-value kpi-counter" data-target="356" data-format="comma">356</div>
@@ -915,8 +911,8 @@
                 <div id="participation" class="page">
                     <div class="page-header flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h2>Assessment Participation & Turnout</h2>
-                            <p>Granular attendance and participation metrics school-wise, grade-wise, and section-wise</p>
+                            <h2>Assessment Participation</h2>
+                            <p>Participation metrics school-wise, grade-wise, and section-wise</p>
                         </div>
                         <div class="flex gap-2">
                             <button class="btn btn-primary" onclick="setParticipationTab('school')" id="btn-part-school">🏫 School-wise</button>
@@ -930,7 +926,7 @@
                         <div class="kpi-card">
                             <div class="kpi-label">📋 Total Enrolled</div>
                             <div class="kpi-value">2,847</div>
-                            <div class="text-xs text-gray-500">All 6 School Branches</div>
+                            <div class="text-xs text-gray-500">All 4 Branches</div>
                         </div>
                         <div class="kpi-card success">
                             <div class="kpi-label">✅ Total Assessed</div>
@@ -946,19 +942,14 @@
                             <div class="text-xs text-amber-600 font-bold">3.2% Absentee Rate</div>
                             <div class="kpi-action-hint">View 91 Absent Students List →</div>
                         </div>
-                        <div class="kpi-card">
-                            <div class="kpi-label">🏫 Active Cohorts</div>
-                            <div class="kpi-value">24 Sections</div>
-                            <div class="text-xs text-gray-500">Grades 3–10 (Sec A, B, C)</div>
-                        </div>
                     </div>
 
                     <!-- View 1: School-wise Participation -->
                     <div id="part-view-school" class="participation-subview">
                         <div class="table-card">
                             <div class="table-header">
-                                <div class="table-header-title">🏫 School-Wise Participation & Turnout</div>
-                                <span class="text-xs font-semibold text-gray-500">6 Global Edge School Branches</span>
+                                <div class="table-header-title">🏫 School-Wise Participation</div>
+                                <span class="text-xs font-semibold text-gray-500">4 Branches</span>
                             </div>
                             <table>
                                 <thead>
@@ -969,7 +960,7 @@
                                         <th>Assessed</th>
                                         <th>Absent</th>
                                         <th>Participation Rate</th>
-                                        <th>Turnout Status</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="schoolParticipationTableBody"></tbody>
@@ -993,7 +984,6 @@
                                         <th>Absent Count</th>
                                         <th>Boys Assessed</th>
                                         <th>Girls Assessed</th>
-                                        <th>Turnout Rate</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -1006,13 +996,11 @@
                     <div id="part-view-section" class="participation-subview" style="display:none;">
                         <div class="filter-group mb-4">
                             <select class="filter-select" id="sectionSchoolFilter" onchange="renderSectionParticipationTable()">
-                                <option value="All">All School Branches (24 Sections)</option>
+                                <option value="All">All School Branches (16 Sections)</option>
                                 <option value="The Global Edge School - Madhapur">The Global Edge School - Madhapur</option>
-                                <option value="The Global Edge School - Kukatpally">The Global Edge School - Kukatpally</option>
-                                <option value="The Global Edge School - Banjara Hills">The Global Edge School - Banjara Hills</option>
-                                <option value="The Global Edge School - Financial District">The Global Edge School - Financial District</option>
-                                <option value="The Global Edge School - Gachibowli">The Global Edge School - Gachibowli</option>
-                                <option value="The Global Edge School - Vasant Nagar">The Global Edge School - Vasant Nagar</option>
+                                <option value="The Global Edge School - KPHB">The Global Edge School - KPHB</option>
+                                <option value="The Global Edge School - Kokapet">The Global Edge School - Kokapet</option>
+                                <option value="The Global Edge School - Vasanth Nagar">The Global Edge School - Vasanth Nagar</option>
                             </select>
                             <select class="filter-select" id="sectionGradeFilter" onchange="renderSectionParticipationTable()">
                                 <option value="All">All Grades (3 to 10)</option>
@@ -1042,7 +1030,6 @@
                                             <th>Enrolled</th>
                                             <th>Assessed</th>
                                             <th>Absent</th>
-                                            <th>Turnout Rate</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -1057,7 +1044,7 @@
                 <div id="performance" class="page">
                     <div class="page-header">
                         <h2>Grade & Subject Performance Analysis</h2>
-                        <p>In-depth multi-dimensional academic diagnostics</p>
+                        <p>In-depth multi-dimensional academic analysis</p>
                     </div>
 
                     <div class="filter-group mb-5">
@@ -1087,12 +1074,6 @@
                                 <canvas id="performanceSubjectChart"></canvas>
                             </div>
                         </div>
-                        <div class="chart-card">
-                            <div class="chart-title">📈 Stacked Grade Mastery Distribution</div>
-                            <div class="chart-canvas">
-                                <canvas id="performanceGradeChart"></canvas>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="table-card">
@@ -1108,60 +1089,109 @@
                                     <th>Math</th>
                                     <th>English</th>
                                     <th>Science</th>
-                                    <th>Excellent %</th>
-                                    <th>Below Grade %</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td><strong>Grade 3</strong></td><td>312</td><td>71.2%</td><td>72.1%</td><td>70.8%</td><td>70.7%</td><td>48%</td><td>8%</td></tr>
-                                <tr><td><strong>Grade 4</strong></td><td>298</td><td>69.8%</td><td>70.4%</td><td>68.2%</td><td>70.8%</td><td>42%</td><td>11%</td></tr>
-                                <tr><td><strong>Grade 5</strong></td><td>287</td><td>68.4%</td><td>67.8%</td><td>68.9%</td><td>68.5%</td><td>38%</td><td>13%</td></tr>
-                                <tr><td><strong>Grade 6</strong></td><td>315</td><td>67.2%</td><td>66.5%</td><td>67.8%</td><td>67.3%</td><td>35%</td><td>14%</td></tr>
-                                <tr><td><strong>Grade 7</strong></td><td>304</td><td>66.8%</td><td>65.9%</td><td>67.2%</td><td>67.3%</td><td>33%</td><td>15%</td></tr>
-                                <tr><td><strong>Grade 8</strong></td><td>318</td><td>68.1%</td><td>69.2%</td><td>67.4%</td><td>67.7%</td><td>36%</td><td>12%</td></tr>
-                                <tr><td><strong>Grade 9</strong></td><td>296</td><td>67.5%</td><td>68.1%</td><td>66.8%</td><td>67.6%</td><td>34%</td><td>14%</td></tr>
-                                <tr><td><strong>Grade 10</strong></td><td>226</td><td>69.2%</td><td>70.1%</td><td>68.5%</td><td>69.0%</td><td>40%</td><td>10%</td></tr>
+                                <tr><td><strong>Grade 3</strong></td><td>312</td><td>71.2%</td><td>72.1%</td><td>70.8%</td><td>70.7%</td></tr>
+                                <tr><td><strong>Grade 4</strong></td><td>298</td><td>69.8%</td><td>70.4%</td><td>68.2%</td><td>70.8%</td></tr>
+                                <tr><td><strong>Grade 5</strong></td><td>287</td><td>68.4%</td><td>67.8%</td><td>68.9%</td><td>68.5%</td></tr>
+                                <tr><td><strong>Grade 6</strong></td><td>315</td><td>67.2%</td><td>66.5%</td><td>67.8%</td><td>67.3%</td></tr>
+                                <tr><td><strong>Grade 7</strong></td><td>304</td><td>66.8%</td><td>65.9%</td><td>67.2%</td><td>67.3%</td></tr>
+                                <tr><td><strong>Grade 8</strong></td><td>318</td><td>68.1%</td><td>69.2%</td><td>67.4%</td><td>67.7%</td></tr>
+                                <tr><td><strong>Grade 9</strong></td><td>296</td><td>67.5%</td><td>68.1%</td><td>66.8%</td><td>67.6%</td></tr>
+                                <tr><td><strong>Grade 10</strong></td><td>226</td><td>69.2%</td><td>70.1%</td><td>68.5%</td><td>69.0%</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 3. Learning Gaps Page -->
+                <!-- 3. Learning Gaps & Questions Page -->
                 <div id="gaps" class="page">
-                    <div class="page-header">
-                        <h2>Competency & Learning Gap Analysis</h2>
-                        <p>Detailed breakdown of learning deficits by subject and grade level</p>
+                    <div class="page-header flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2>Learning Gaps & Question Analysis</h2>
+                            <p>Curricular competency deficits and question-level item performance</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary" onclick="setGapsTab('all')" id="btn-gaps-all">📋 View All</button>
+                            <button class="btn" style="background:#e2e8f0; color:#334155;" onclick="setGapsTab('gaps')" id="btn-gaps-summary">⚠️ Competency Gaps</button>
+                            <button class="btn" style="background:#e2e8f0; color:#334155;" onclick="setGapsTab('questions')" id="btn-gaps-questions">❓ Question Analysis</button>
+                        </div>
                     </div>
 
-                    <div class="table-card">
-                        <div class="table-header">
-                            <div class="table-header-title">Diagnostic Competency Gap Register</div>
+                    <!-- View 1: Competency Gaps Summary -->
+                    <div id="gaps-summary-view" class="gaps-subview mb-6">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="table-header-title">Competency Gap Register</div>
+                                <span class="text-xs font-semibold text-gray-500">8 Critical Deficits</span>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Competency / Learning Objective</th>
+                                            <th>Grade</th>
+                                            <th>Actual</th>
+                                            <th>Gap %</th>
+                                            <th>Students Affected</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Mathematics</td><td>Fractions - Division</td><td>5</td><td>40%</td><td><span class="gap-indicator gap-high"></span><strong>45%</strong></td><td>156</td><td><span class="badge danger">Critical</span></td></tr>
+                                        <tr><td>English</td><td>Comprehension - Inference</td><td>6</td><td>42%</td><td><span class="gap-indicator gap-high"></span><strong>38%</strong></td><td>124</td><td><span class="badge danger">Critical</span></td></tr>
+                                        <tr><td>Science</td><td>Photosynthesis</td><td>7</td><td>46%</td><td><span class="gap-indicator gap-medium"></span><strong>34%</strong></td><td>98</td><td><span class="badge warning">High</span></td></tr>
+                                        <tr><td>Mathematics</td><td>Decimals - Addition</td><td>4</td><td>53%</td><td><span class="gap-indicator gap-medium"></span><strong>32%</strong></td><td>87</td><td><span class="badge warning">High</span></td></tr>
+                                        <tr><td>English</td><td>Grammar - Tenses</td><td>5</td><td>52%</td><td><span class="gap-indicator gap-medium"></span><strong>28%</strong></td><td>72</td><td><span class="badge warning">High</span></td></tr>
+                                        <tr><td>Science</td><td>Cellular Structure</td><td>8</td><td>51%</td><td><span class="gap-indicator gap-medium"></span><strong>24%</strong></td><td>65</td><td><span class="badge warning">High</span></td></tr>
+                                        <tr><td>Mathematics</td><td>Ratio & Proportion</td><td>6</td><td>61%</td><td><span class="gap-indicator gap-medium"></span><strong>19%</strong></td><td>54</td><td><span class="badge warning">Medium</span></td></tr>
+                                        <tr><td>English</td><td>Vocabulary Building</td><td>4</td><td>70%</td><td><span class="gap-indicator gap-low"></span><strong>15%</strong></td><td>42</td><td><span class="badge success">Low</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div style="overflow-x: auto;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Subject</th>
-                                        <th>Competency / Learning Objective</th>
-                                        <th>Grade</th>
-                                        <th>Expected</th>
-                                        <th>Actual</th>
-                                        <th>Gap %</th>
-                                        <th>Students Affected</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Mathematics</td><td>Fractions - Division</td><td>5</td><td>85%</td><td>40%</td><td><span class="gap-indicator gap-high"></span><strong>45%</strong></td><td>156</td><td><span class="badge danger">Critical</span></td></tr>
-                                    <tr><td>English</td><td>Comprehension - Inference</td><td>6</td><td>80%</td><td>42%</td><td><span class="gap-indicator gap-high"></span><strong>38%</strong></td><td>124</td><td><span class="badge danger">Critical</span></td></tr>
-                                    <tr><td>Science</td><td>Photosynthesis</td><td>7</td><td>80%</td><td>46%</td><td><span class="gap-indicator gap-medium"></span><strong>34%</strong></td><td>98</td><td><span class="badge warning">High</span></td></tr>
-                                    <tr><td>Mathematics</td><td>Decimals - Addition</td><td>4</td><td>85%</td><td>53%</td><td><span class="gap-indicator gap-medium"></span><strong>32%</strong></td><td>87</td><td><span class="badge warning">High</span></td></tr>
-                                    <tr><td>English</td><td>Grammar - Tenses</td><td>5</td><td>80%</td><td>52%</td><td><span class="gap-indicator gap-medium"></span><strong>28%</strong></td><td>72</td><td><span class="badge warning">High</span></td></tr>
-                                    <tr><td>Science</td><td>Cellular Structure</td><td>8</td><td>75%</td><td>51%</td><td><span class="gap-indicator gap-medium"></span><strong>24%</strong></td><td>65</td><td><span class="badge warning">High</span></td></tr>
-                                    <tr><td>Mathematics</td><td>Ratio & Proportion</td><td>6</td><td>80%</td><td>61%</td><td><span class="gap-indicator gap-medium"></span><strong>19%</strong></td><td>54</td><td><span class="badge warning">Medium</span></td></tr>
-                                    <tr><td>English</td><td>Vocabulary Building</td><td>4</td><td>85%</td><td>70%</td><td><span class="gap-indicator gap-low"></span><strong>15%</strong></td><td>42</td><td><span class="badge success">Low</span></td></tr>
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <!-- View 2: Question-Level Item Analysis (50 Questions Per Subject) -->
+                    <div id="gaps-questions-view" class="gaps-subview">
+                        <div class="filter-group mb-4">
+                            <select class="filter-select" id="questionSubjectFilter" onchange="renderQuestionsTable()">
+                                <option value="Mathematics">Mathematics (50 Questions)</option>
+                                <option value="English">English (50 Questions)</option>
+                                <option value="Science">Science (50 Questions)</option>
+                            </select>
+                            <select class="filter-select" id="questionDiffFilter" onchange="renderQuestionsTable()">
+                                <option value="">All Difficulty Levels (50 Qs)</option>
+                                <option value="Low">Low (15 Qs)</option>
+                                <option value="Med">Medium (20 Qs)</option>
+                                <option value="High">High (15 Qs)</option>
+                            </select>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="table-header-title" id="questionsTableTitle">Mathematics - 50 Assessment Questions</div>
+                                <span class="text-xs font-semibold text-gray-500" id="questionsCountBadge">Showing 50 of 50 Questions</span>
+                            </div>
+                            <div style="max-height: 550px; overflow-y: auto;">
+                                <table>
+                                    <thead style="position: sticky; top: 0; z-index: 10;">
+                                        <tr>
+                                            <th>Q#</th>
+                                            <th>Subject</th>
+                                            <th>Difficulty Tier</th>
+                                            <th>Curricular Topic</th>
+                                            <th>Learning Objective / Competency</th>
+                                            <th>Correct %</th>
+                                            <th>Incorrect %</th>
+                                            <th>Item Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="questionsTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1169,8 +1199,8 @@
                 <!-- 4. Subjects Page -->
                 <div id="subjects" class="page">
                     <div class="page-header">
-                        <h2>Subject-Wise Diagnostic Analysis</h2>
-                        <p>Granular progression and proficiency distribution by subject</p>
+                        <h2>Subject-Wise Analysis</h2>
+                        <p>Progression and proficiency distribution by subject</p>
                     </div>
 
                     <div class="charts-grid">
@@ -1212,53 +1242,7 @@
                     </div>
                 </div>
 
-                <!-- 5. Questions Page (50 Questions Per Subject) -->
-                <div id="questions" class="page">
-                    <div class="page-header">
-                        <h2>Question-Level Item Analysis (50 Questions Per Subject)</h2>
-                        <p>Psychometric item performance across 50 questions (15 Low 1M, 20 Med 2M, 15 High 3M)</p>
-                    </div>
-
-                    <div class="filter-group mb-4">
-                        <select class="filter-select" id="questionSubjectFilter" onchange="renderQuestionsTable()">
-                            <option value="Mathematics">Mathematics (50 Questions)</option>
-                            <option value="English">English (50 Questions)</option>
-                            <option value="Science">Science (50 Questions)</option>
-                        </select>
-                        <select class="filter-select" id="questionDiffFilter" onchange="renderQuestionsTable()">
-                            <option value="">All Difficulty Levels (50 Qs)</option>
-                            <option value="Low (1M)">Low - 1 Mark (15 Qs)</option>
-                            <option value="Med (2M)">Medium - 2 Marks (20 Qs)</option>
-                            <option value="High (3M)">High - 3 Marks (15 Qs)</option>
-                        </select>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-header">
-                            <div class="table-header-title" id="questionsTableTitle">Mathematics - 50 Assessment Questions</div>
-                            <span class="text-xs font-semibold text-gray-500" id="questionsCountBadge">Showing 50 of 50 Questions</span>
-                        </div>
-                        <div style="max-height: 550px; overflow-y: auto;">
-                            <table>
-                                <thead style="position: sticky; top: 0; z-index: 10;">
-                                    <tr>
-                                        <th>Q#</th>
-                                        <th>Subject</th>
-                                        <th>Difficulty Tier</th>
-                                        <th>Curricular Topic</th>
-                                        <th>Learning Objective / Competency</th>
-                                        <th>Correct %</th>
-                                        <th>Incorrect %</th>
-                                        <th>Item Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="questionsTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. Students Page -->
+                <!-- 5. Students Page -->
                 <div id="students" class="page">
                     <div class="page-header">
                         <h2>Student Directory & Performance Roster</h2>
@@ -1272,7 +1256,7 @@
 
                     <div class="table-card">
                         <div class="table-header">
-                            <div class="table-header-title">Student Diagnostic Results</div>
+                            <div class="table-header-title">Student Assessment Results</div>
                         </div>
                         <table>
                             <thead>
@@ -1312,7 +1296,7 @@
                                     <th>School Branch</th>
                                     <th>Campus Location</th>
                                     <th>Students Assessed</th>
-                                    <th>Turnout %</th>
+                                    <th>Participation Rate</th>
                                     <th>Avg Score</th>
                                     <th>Grade Level %</th>
                                     <th>Learning Gap %</th>
@@ -1321,11 +1305,11 @@
                             </thead>
                             <tbody>
                                 <tr><td><strong>The Global Edge School - Madhapur</strong></td><td>Madhapur (Hitec City)</td><td>185</td><td>98%</td><td>72.4%</td><td>68%</td><td>12%</td><td><span class="badge success">Low</span></td></tr>
-                                <tr><td><strong>The Global Edge School - Kukatpally</strong></td><td>Kukatpally</td><td>142</td><td>96%</td><td>65.8%</td><td>58%</td><td>22%</td><td><span class="badge warning">Medium</span></td></tr>
-                                <tr><td><strong>The Global Edge School - Banjara Hills</strong></td><td>Banjara Hills</td><td>108</td><td>91%</td><td>62.1%</td><td>48%</td><td>32%</td><td><span class="badge danger">High</span></td></tr>
-                                <tr><td><strong>The Global Edge School - Financial District</strong></td><td>Financial District</td><td>256</td><td>97%</td><td>68.9%</td><td>62%</td><td>18%</td><td><span class="badge warning">Medium</span></td></tr>
-                                <tr><td><strong>The Global Edge School - Gachibowli</strong></td><td>Gachibowli</td><td>198</td><td>94%</td><td>64.5%</td><td>52%</td><td>28%</td><td><span class="badge warning">Medium</span></td></tr>
-                                <tr><td><strong>The Global Edge School - Vasant Nagar</strong></td><td>Vasant Nagar</td><td>122</td><td>88%</td><td>59.2%</td><td>42%</td><td>38%</td><td><span class="badge danger">High</span></td></tr>
+                                <tr><td><strong>The Global Edge School - KPHB</strong></td><td>Kukatpally</td><td>142</td><td>96%</td><td>65.8%</td><td>58%</td><td>22%</td><td><span class="badge warning">Medium</span></td></tr>
+                                <tr><td><strong>The Global Edge School - Kokapet</strong></td><td>Banjara Hills</td><td>108</td><td>91%</td><td>62.1%</td><td>48%</td><td>32%</td><td><span class="badge danger">High</span></td></tr>
+                                <tr><td><strong>The Global Edge School - Kokapet</strong></td><td>Financial District</td><td>256</td><td>97%</td><td>68.9%</td><td>62%</td><td>18%</td><td><span class="badge warning">Medium</span></td></tr>
+                                <tr><td><strong>The Global Edge School - Kokapet</strong></td><td>Gachibowli</td><td>198</td><td>94%</td><td>64.5%</td><td>52%</td><td>28%</td><td><span class="badge warning">Medium</span></td></tr>
+                                <tr><td><strong>The Global Edge School - Vasanth Nagar</strong></td><td>Vasanth Nagar</td><td>122</td><td>88%</td><td>59.2%</td><td>42%</td><td>38%</td><td><span class="badge danger">High</span></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1353,7 +1337,7 @@
                                     <span class="text-xs text-gray-500">Action: Guided reading sessions, inference strategy workshops</span>
                                 </div>
                                 <div class="intervention-item">
-                                    <strong>Schools: Jindal High School #3</strong><br>
+                                    <strong>Branch Support: Vasanth Nagar Campus</strong><br>
                                     122 students | Overall Gap: 38%<br>
                                     <span class="text-xs text-gray-500">Action: Resource allocation, teacher professional development</span>
                                 </div>
@@ -1392,7 +1376,7 @@
                                 <div class="intervention-item">
                                     <strong>Continuous Improvement</strong><br>
                                     Branches performing above 70% average<br>
-                                    <span class="text-xs text-gray-500">Action: Best practice sharing across Jindal group schools</span>
+                                    <span class="text-xs text-gray-500">Action: Best practice sharing across Global Edge School branches</span>
                                 </div>
                             </div>
                         </div>
@@ -1402,14 +1386,14 @@
                 <!-- 9. Reports Page -->
                 <div id="reports" class="page">
                     <div class="page-header">
-                        <h2>Report Generation & Export Center</h2>
-                        <p>Generate clean, printable, and downloadable assessment documents</p>
+                        <h2>Official Assessment Reports & Briefings</h2>
+                        <p>Download, print, or export institutional assessment reports</p>
                     </div>
 
                     <div class="reports-grid">
                         <div class="report-card">
                             <div class="report-icon">👨‍🎓</div>
-                            <div class="report-title">Student Diagnostic Report</div>
+                            <div class="report-title">Student Assessment Report</div>
                             <div class="report-description">Individual 2-page student report card with scores, difficulty matrix, and 90 LOs.</div>
                             <button class="btn btn-primary" onclick="generateReport('student')">View & Print Report</button>
                         </div>
@@ -1464,7 +1448,7 @@
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">📋</span>
                     <div>
-                        <h3 class="text-base sm:text-lg font-bold text-gray-900 leading-tight">SODHANA Student Diagnostic Report Card</h3>
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 leading-tight">SODHANA Student Assessment Report Card</h3>
                         <p class="text-xs text-gray-500">Official Evaluation Sheet (2-Page Printable Layout)</p>
                     </div>
                 </div>
@@ -1485,7 +1469,7 @@
             <div id="report-modal-scroll" class="flex-1 overflow-y-auto px-2 sm:px-6 py-4" style="background:#eaedf0;">
                 
                 <!-- ========================================================================= -->
-                <!-- PAGE 1: PERFORMANCE AND DIAGNOSTIC OVERVIEW                                -->
+                <!-- PAGE 1: PERFORMANCE OVERVIEW                                              -->
                 <!-- ========================================================================= -->
                 <div id="report-a4-sheet" class="report-a4-sheet" style="max-width: 880px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #334155; line-height: 1.35;">
                     
@@ -1502,7 +1486,7 @@
 
                         <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 10px; text-align: center; background: #f8fafc;">
                             <div style="font-size: 10px; font-weight: 700; color: #1e3a2f; text-transform: uppercase;">SODHANA</div>
-                            <div style="font-size: 9px; color: #64748b;">Diagnostic Evaluation</div>
+                            <div style="font-size: 9px; color: #64748b;">Holistic Evaluation</div>
                         </div>
                     </div>
 
@@ -1829,7 +1813,7 @@
                             <h3 class="text-lg font-bold text-white">Absentee Tracking & Make-Up Register</h3>
                             <span class="px-2 py-0.5 rounded-full text-xs font-extrabold bg-red-500 text-white shadow-sm" id="absenteeModalHeaderCount">91 Absent</span>
                         </div>
-                        <p class="text-xs text-emerald-100/80">SODHANA Assessment &bull; Diagnostic Attendance Recovery Roster</p>
+                        <p class="text-xs text-emerald-100/80">SODHANA Assessment &bull; Attendance Recovery Roster</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -1852,13 +1836,13 @@
                         class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-medium bg-white text-gray-800 outline-none focus:border-[#347363] w-56 sm:w-64">
                     
                     <select id="absenteeSchoolFilter" onchange="filterAbsenteeTable()" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold bg-white text-gray-700 outline-none focus:border-[#347363]">
-                        <option value="All">All Schools (6 Branches)</option>
+                        <option value="All">All Schools (4 Branches)</option>
                         <option value="The Global Edge School - Madhapur">The Global Edge School - Madhapur</option>
-                        <option value="The Global Edge School - Kukatpally">The Global Edge School - Kukatpally</option>
-                        <option value="The Global Edge School - Banjara Hills">The Global Edge School - Banjara Hills</option>
-                        <option value="The Global Edge School - Financial District">The Global Edge School - Financial District</option>
-                        <option value="The Global Edge School - Gachibowli">The Global Edge School - Gachibowli</option>
-                        <option value="The Global Edge School - Vasant Nagar">The Global Edge School - Vasant Nagar</option>
+                        <option value="The Global Edge School - KPHB">The Global Edge School - KPHB</option>
+                        <option value="The Global Edge School - Kokapet">The Global Edge School - Kokapet</option>
+                        <option value="The Global Edge School - Kokapet">The Global Edge School - Kokapet</option>
+                        <option value="The Global Edge School - Kokapet">The Global Edge School - Kokapet</option>
+                        <option value="The Global Edge School - Vasanth Nagar">The Global Edge School - Vasanth Nagar</option>
                     </select>
 
                     <select id="absenteeGradeFilter" onchange="filterAbsenteeTable()" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold bg-white text-gray-700 outline-none focus:border-[#347363]">
@@ -1938,33 +1922,33 @@
         const students = [
             { id: 'S001', name: 'Aarav Sharma', grade: 5, school: 'The Global Edge School - Madhapur', math: 75, english: 72, science: 78, overall: 75, level: 'Proficient', gap: 'Low' },
             { id: 'S002', name: 'Anaya Patel', grade: 5, school: 'The Global Edge School - Madhapur', math: 82, english: 85, science: 80, overall: 82, level: 'Excellent', gap: 'Low' },
-            { id: 'S003', name: 'Arjun Kumar', grade: 5, school: 'The Global Edge School - Kukatpally', math: 35, english: 38, science: 42, overall: 38, level: 'Beginning', gap: 'High' },
+            { id: 'S003', name: 'Arjun Kumar', grade: 5, school: 'The Global Edge School - KPHB', math: 35, english: 38, science: 42, overall: 38, level: 'Beginning', gap: 'High' },
             { id: 'S004', name: 'Diya Singh', grade: 6, school: 'The Global Edge School - Madhapur', math: 78, english: 75, science: 80, overall: 78, level: 'Proficient', gap: 'Low' },
-            { id: 'S005', name: 'Esha Verma', grade: 6, school: 'The Global Edge School - Kukatpally', math: 45, english: 42, science: 50, overall: 46, level: 'Developing', gap: 'High' },
+            { id: 'S005', name: 'Esha Verma', grade: 6, school: 'The Global Edge School - KPHB', math: 45, english: 42, science: 50, overall: 46, level: 'Developing', gap: 'High' },
             { id: 'S006', name: 'Farhan Khan', grade: 4, school: 'The Global Edge School - Madhapur', math: 72, english: 68, science: 70, overall: 70, level: 'Proficient', gap: 'Low' },
-            { id: 'S007', name: 'Gita Desai', grade: 7, school: 'The Global Edge School - Banjara Hills', math: 88, english: 90, science: 85, overall: 88, level: 'Excellent', gap: 'Low' },
-            { id: 'S008', name: 'Harsh Gupta', grade: 7, school: 'The Global Edge School - Financial District', math: 55, english: 52, science: 58, overall: 55, level: 'Developing', gap: 'Medium' },
+            { id: 'S007', name: 'Gita Desai', grade: 7, school: 'The Global Edge School - Kokapet', math: 88, english: 90, science: 85, overall: 88, level: 'Excellent', gap: 'Low' },
+            { id: 'S008', name: 'Harsh Gupta', grade: 7, school: 'The Global Edge School - Kokapet', math: 55, english: 52, science: 58, overall: 55, level: 'Developing', gap: 'Medium' },
             { id: 'S009', name: 'Ishaan Reddy', grade: 3, school: 'The Global Edge School - Madhapur', math: 80, english: 78, science: 82, overall: 80, level: 'Excellent', gap: 'Low' },
-            { id: 'S010', name: 'Jiya Chopra', grade: 3, school: 'The Global Edge School - Kukatpally', math: 48, english: 52, science: 50, overall: 50, level: 'Developing', gap: 'Medium' },
-            { id: 'S011', name: 'Kabir Ahmed', grade: 8, school: 'The Global Edge School - Banjara Hills', math: 70, english: 68, science: 72, overall: 70, level: 'Proficient', gap: 'Low' },
-            { id: 'S012', name: 'Kavya Iyer', grade: 8, school: 'The Global Edge School - Financial District', math: 42, english: 38, science: 45, overall: 42, level: 'Beginning', gap: 'High' },
+            { id: 'S010', name: 'Jiya Chopra', grade: 3, school: 'The Global Edge School - KPHB', math: 48, english: 52, science: 50, overall: 50, level: 'Developing', gap: 'Medium' },
+            { id: 'S011', name: 'Kabir Ahmed', grade: 8, school: 'The Global Edge School - Kokapet', math: 70, english: 68, science: 72, overall: 70, level: 'Proficient', gap: 'Low' },
+            { id: 'S012', name: 'Kavya Iyer', grade: 8, school: 'The Global Edge School - Kokapet', math: 42, english: 38, science: 45, overall: 42, level: 'Beginning', gap: 'High' },
             { id: 'S013', name: 'Laxmi Nair', grade: 4, school: 'The Global Edge School - Madhapur', math: 85, english: 82, science: 88, overall: 85, level: 'Excellent', gap: 'Low' },
-            { id: 'S014', name: 'Madhav Rao', grade: 6, school: 'The Global Edge School - Banjara Hills', math: 65, english: 62, science: 68, overall: 65, level: 'Proficient', gap: 'Low' },
-            { id: 'S015', name: 'Nisha Roy', grade: 9, school: 'The Global Edge School - Banjara Hills', math: 78, english: 75, science: 80, overall: 78, level: 'Proficient', gap: 'Low' },
-            { id: 'S016', name: 'Omprakash Singh', grade: 9, school: 'The Global Edge School - Vasant Nagar', math: 32, english: 28, science: 35, overall: 32, level: 'Beginning', gap: 'Critical' },
-            { id: 'S017', name: 'Priya Sharma', grade: 10, school: 'The Global Edge School - Banjara Hills', math: 88, english: 86, science: 90, overall: 88, level: 'Excellent', gap: 'Low' },
+            { id: 'S014', name: 'Madhav Rao', grade: 6, school: 'The Global Edge School - Kokapet', math: 65, english: 62, science: 68, overall: 65, level: 'Proficient', gap: 'Low' },
+            { id: 'S015', name: 'Nisha Roy', grade: 9, school: 'The Global Edge School - Kokapet', math: 78, english: 75, science: 80, overall: 78, level: 'Proficient', gap: 'Low' },
+            { id: 'S016', name: 'Omprakash Singh', grade: 9, school: 'The Global Edge School - Vasanth Nagar', math: 32, english: 28, science: 35, overall: 32, level: 'Beginning', gap: 'Critical' },
+            { id: 'S017', name: 'Priya Sharma', grade: 10, school: 'The Global Edge School - Kokapet', math: 88, english: 86, science: 90, overall: 88, level: 'Excellent', gap: 'Low' },
             { id: 'S018', name: 'Rajesh Kumar', grade: 5, school: 'The Global Edge School - Madhapur', math: 68, english: 65, science: 70, overall: 68, level: 'Proficient', gap: 'Low' },
-            { id: 'S019', name: 'Shriya Gupta', grade: 7, school: 'The Global Edge School - Financial District', math: 58, english: 55, science: 60, overall: 58, level: 'Developing', gap: 'Medium' },
-            { id: 'S020', name: 'Tanvi Mishra', grade: 6, school: 'The Global Edge School - Kukatpally', math: 38, english: 35, science: 40, overall: 38, level: 'Beginning', gap: 'Critical' },
+            { id: 'S019', name: 'Shriya Gupta', grade: 7, school: 'The Global Edge School - Kokapet', math: 58, english: 55, science: 60, overall: 58, level: 'Developing', gap: 'Medium' },
+            { id: 'S020', name: 'Tanvi Mishra', grade: 6, school: 'The Global Edge School - KPHB', math: 38, english: 35, science: 40, overall: 38, level: 'Beginning', gap: 'Critical' },
         ];
 
         const schools = [
             { name: 'The Global Edge School - Madhapur', district: 'Madhapur', students: 185, participation: 98, avgScore: 72.4, gradeLevel: 68, gap: 12 },
-            { name: 'The Global Edge School - Kukatpally', district: 'Kukatpally', students: 142, participation: 96, avgScore: 65.8, gradeLevel: 58, gap: 22 },
-            { name: 'The Global Edge School - Banjara Hills', district: 'Banjara Hills', students: 108, participation: 91, avgScore: 62.1, gradeLevel: 48, gap: 32 },
-            { name: 'The Global Edge School - Financial District', district: 'Financial Dist', students: 256, participation: 97, avgScore: 68.9, gradeLevel: 62, gap: 18 },
-            { name: 'The Global Edge School - Gachibowli', district: 'Gachibowli', students: 198, participation: 94, avgScore: 64.5, gradeLevel: 52, gap: 28 },
-            { name: 'The Global Edge School - Vasant Nagar', district: 'Vasant Nagar', students: 122, participation: 88, avgScore: 59.2, gradeLevel: 42, gap: 38 },
+            { name: 'The Global Edge School - KPHB', district: 'KPHB', students: 142, participation: 96, avgScore: 65.8, gradeLevel: 58, gap: 22 },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', students: 108, participation: 91, avgScore: 62.1, gradeLevel: 48, gap: 32 },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', students: 256, participation: 97, avgScore: 68.9, gradeLevel: 62, gap: 18 },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', students: 198, participation: 94, avgScore: 64.5, gradeLevel: 52, gap: 28 },
+            { name: 'The Global Edge School - Vasanth Nagar', district: 'Vasanth Nagar', students: 122, participation: 88, avgScore: 59.2, gradeLevel: 42, gap: 38 },
         ];
 
         // ==========================================
@@ -1978,9 +1962,10 @@
         });
 
         function navigateToPage(pageId) {
-            showPage(pageId);
+            const actualPageId = (pageId === 'questions') ? 'gaps' : pageId;
+            showPage(actualPageId);
             document.querySelectorAll('.nav-item').forEach(nav => {
-                if (nav.getAttribute('data-page') === pageId) {
+                if (nav.getAttribute('data-page') === actualPageId) {
                     nav.classList.add('active');
                 } else {
                     nav.classList.remove('active');
@@ -1991,23 +1976,69 @@
         }
 
         function showPage(pageId) {
+            const actualPageId = (pageId === 'questions') ? 'gaps' : pageId;
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            const targetEl = document.getElementById(pageId);
+            const targetEl = document.getElementById(actualPageId);
             if (targetEl) targetEl.classList.add('active');
 
-            if (pageId === 'students') {
+            if (actualPageId === 'students') {
                 initStudentPage();
-            } else if (pageId === 'overview') {
+            } else if (actualPageId === 'overview') {
                 initOverviewCharts();
                 animateCounters();
-            } else if (pageId === 'participation') {
+            } else if (actualPageId === 'participation') {
                 initParticipationPage();
-            } else if (pageId === 'performance') {
+            } else if (actualPageId === 'performance') {
                 initPerformanceCharts();
-            } else if (pageId === 'subjects') {
+            } else if (actualPageId === 'subjects') {
                 initSubjectCharts();
-            } else if (pageId === 'questions') {
+            } else if (actualPageId === 'gaps') {
                 initQuestionsPage();
+                if (pageId === 'questions') {
+                    setGapsTab('questions');
+                }
+            }
+        }
+
+        function setGapsTab(tabName) {
+            const vSummary = document.getElementById('gaps-summary-view');
+            const vQuestions = document.getElementById('gaps-questions-view');
+            const bAll = document.getElementById('btn-gaps-all');
+            const bSummary = document.getElementById('btn-gaps-summary');
+            const bQuestions = document.getElementById('btn-gaps-questions');
+
+            [bAll, bSummary, bQuestions].forEach(b => {
+                if (b) {
+                    b.classList.remove('btn-primary');
+                    b.style.background = '#e2e8f0';
+                    b.style.color = '#334155';
+                }
+            });
+
+            if (tabName === 'all') {
+                if (vSummary) vSummary.style.display = 'block';
+                if (vQuestions) vQuestions.style.display = 'block';
+                if (bAll) {
+                    bAll.classList.add('btn-primary');
+                    bAll.style.background = '';
+                    bAll.style.color = '';
+                }
+            } else if (tabName === 'gaps') {
+                if (vSummary) vSummary.style.display = 'block';
+                if (vQuestions) vQuestions.style.display = 'none';
+                if (bSummary) {
+                    bSummary.classList.add('btn-primary');
+                    bSummary.style.background = '';
+                    bSummary.style.color = '';
+                }
+            } else if (tabName === 'questions') {
+                if (vSummary) vSummary.style.display = 'none';
+                if (vQuestions) vQuestions.style.display = 'block';
+                if (bQuestions) {
+                    bQuestions.classList.add('btn-primary');
+                    bQuestions.style.background = '';
+                    bQuestions.style.color = '';
+                }
             }
         }
 
@@ -2130,7 +2161,7 @@
                 charts.schoolChart = new Chart(ctx4, {
                     type: 'bar',
                     data: {
-                        labels: ['GES - Madhapur', 'GES - Kukatpally', 'GES - Banjara Hills', 'GES - Financial Dist', 'GES - Gachibowli', 'GES - Vasant Nagar'],
+                        labels: ['GES - Madhapur', 'GES - KPHB', 'GES - Kokapet', 'GES - Vasanth Nagar'],
                         datasets: [{
                             label: 'Average Score (%)',
                             data: [72.4, 65.8, 62.1, 68.9, 64.5, 59.2],
@@ -2230,11 +2261,11 @@
         // ==========================================
         const schoolParticipationData = [
             { name: 'The Global Edge School - Madhapur', district: 'Madhapur', enrolled: 540, assessed: 528, absent: 12, turnout: 97.8, status: 'Excellent', statusBadge: 'success' },
-            { name: 'The Global Edge School - Kukatpally', district: 'Kukatpally', enrolled: 485, assessed: 471, absent: 14, turnout: 97.1, status: 'Excellent', statusBadge: 'success' },
-            { name: 'The Global Edge School - Banjara Hills', district: 'Banjara Hills', enrolled: 620, assessed: 604, absent: 16, turnout: 97.4, status: 'Excellent', statusBadge: 'success' },
-            { name: 'The Global Edge School - Financial District', district: 'Financial Dist', enrolled: 450, assessed: 432, absent: 18, turnout: 96.0, status: 'Excellent', statusBadge: 'success' },
-            { name: 'The Global Edge School - Gachibowli', district: 'Gachibowli', enrolled: 412, assessed: 395, absent: 17, turnout: 95.9, status: 'Excellent', statusBadge: 'success' },
-            { name: 'The Global Edge School - Vasant Nagar', district: 'Vasant Nagar', enrolled: 340, assessed: 326, absent: 14, turnout: 95.9, status: 'Good', statusBadge: 'info' }
+            { name: 'The Global Edge School - KPHB', district: 'KPHB', enrolled: 485, assessed: 471, absent: 14, turnout: 97.1, status: 'Excellent', statusBadge: 'success' },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', enrolled: 620, assessed: 604, absent: 16, turnout: 97.4, status: 'Excellent', statusBadge: 'success' },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', enrolled: 450, assessed: 432, absent: 18, turnout: 96.0, status: 'Excellent', statusBadge: 'success' },
+            { name: 'The Global Edge School - Kokapet', district: 'Kokapet', enrolled: 412, assessed: 395, absent: 17, turnout: 95.9, status: 'Excellent', statusBadge: 'success' },
+            { name: 'The Global Edge School - Vasanth Nagar', district: 'Vasanth Nagar', enrolled: 340, assessed: 326, absent: 14, turnout: 95.9, status: 'Good', statusBadge: 'info' }
         ];
 
         const gradeParticipationData = [
@@ -2253,26 +2284,26 @@
             { school: 'The Global Edge School - Madhapur', grade: 3, section: 'B', teacher: 'Mr. R. Verma', enrolled: 40, assessed: 39, absent: 1, turnout: 97.5, status: 'High', statusBadge: 'success' },
             { school: 'The Global Edge School - Madhapur', grade: 4, section: 'A', teacher: 'Mrs. A. Gupta', enrolled: 38, assessed: 37, absent: 1, turnout: 97.4, status: 'High', statusBadge: 'success' },
             { school: 'The Global Edge School - Madhapur', grade: 5, section: 'A', teacher: 'Ms. P. Rao', enrolled: 37, assessed: 36, absent: 1, turnout: 97.3, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Kukatpally', grade: 4, section: 'B', teacher: 'Mr. K. Patel', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Kukatpally', grade: 5, section: 'B', teacher: 'Mr. M. Nair', enrolled: 37, assessed: 36, absent: 1, turnout: 97.3, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Kukatpally', grade: 6, section: 'A', teacher: 'Mrs. D. Singh', enrolled: 41, assessed: 40, absent: 1, turnout: 97.6, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Kukatpally', grade: 7, section: 'A', teacher: 'Mrs. T. Roy', enrolled: 39, assessed: 38, absent: 1, turnout: 97.4, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Banjara Hills', grade: 6, section: 'B', teacher: 'Mr. V. Joshi', enrolled: 40, assessed: 38, absent: 2, turnout: 95.0, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Banjara Hills', grade: 7, section: 'B', teacher: 'Mr. S. Iyer', enrolled: 40, assessed: 38, absent: 2, turnout: 95.0, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Banjara Hills', grade: 8, section: 'A', teacher: 'Ms. N. Banerjee', enrolled: 42, assessed: 41, absent: 1, turnout: 97.6, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Banjara Hills', grade: 9, section: 'A', teacher: 'Mrs. L. Sen', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Banjara Hills', grade: 10, section: 'A', teacher: 'Dr. R. Kulkarni', enrolled: 30, assessed: 29, absent: 1, turnout: 96.7, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Financial District', grade: 8, section: 'B', teacher: 'Mr. H. Mehra', enrolled: 41, assessed: 39, absent: 2, turnout: 95.1, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Financial District', grade: 9, section: 'B', teacher: 'Mr. P. Reddy', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Financial District', grade: 10, section: 'B', teacher: 'Mrs. B. Das', enrolled: 30, assessed: 28, absent: 2, turnout: 93.3, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Gachibowli', grade: 3, section: 'A', teacher: 'Ms. K. Seth', enrolled: 35, assessed: 34, absent: 1, turnout: 97.1, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Gachibowli', grade: 4, section: 'A', teacher: 'Mr. A. Kapoor', enrolled: 36, assessed: 34, absent: 2, turnout: 94.4, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Gachibowli', grade: 5, section: 'A', teacher: 'Mrs. M. Joseph', enrolled: 38, assessed: 37, absent: 1, turnout: 97.4, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Gachibowli', grade: 6, section: 'A', teacher: 'Mr. N. Bhatt', enrolled: 38, assessed: 36, absent: 2, turnout: 94.7, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Vasant Nagar', grade: 7, section: 'A', teacher: 'Ms. F. Khan', enrolled: 35, assessed: 33, absent: 2, turnout: 94.3, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Vasant Nagar', grade: 8, section: 'A', teacher: 'Mr. E. Thomas', enrolled: 35, assessed: 34, absent: 1, turnout: 97.1, status: 'High', statusBadge: 'success' },
-            { school: 'The Global Edge School - Vasant Nagar', grade: 9, section: 'A', teacher: 'Mrs. U. Mishra', enrolled: 34, assessed: 32, absent: 2, turnout: 94.1, status: 'Moderate', statusBadge: 'warning' },
-            { school: 'The Global Edge School - Vasant Nagar', grade: 10, section: 'A', teacher: 'Mr. T. George', enrolled: 30, assessed: 28, absent: 2, turnout: 93.3, status: 'Moderate', statusBadge: 'warning' }
+            { school: 'The Global Edge School - KPHB', grade: 4, section: 'B', teacher: 'Mr. K. Patel', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - KPHB', grade: 5, section: 'B', teacher: 'Mr. M. Nair', enrolled: 37, assessed: 36, absent: 1, turnout: 97.3, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - KPHB', grade: 6, section: 'A', teacher: 'Mrs. D. Singh', enrolled: 41, assessed: 40, absent: 1, turnout: 97.6, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - KPHB', grade: 7, section: 'A', teacher: 'Mrs. T. Roy', enrolled: 39, assessed: 38, absent: 1, turnout: 97.4, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 6, section: 'B', teacher: 'Mr. V. Joshi', enrolled: 40, assessed: 38, absent: 2, turnout: 95.0, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 7, section: 'B', teacher: 'Mr. S. Iyer', enrolled: 40, assessed: 38, absent: 2, turnout: 95.0, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 8, section: 'A', teacher: 'Ms. N. Banerjee', enrolled: 42, assessed: 41, absent: 1, turnout: 97.6, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 9, section: 'A', teacher: 'Mrs. L. Sen', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Kokapet', grade: 10, section: 'A', teacher: 'Dr. R. Kulkarni', enrolled: 30, assessed: 29, absent: 1, turnout: 96.7, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 8, section: 'B', teacher: 'Mr. H. Mehra', enrolled: 41, assessed: 39, absent: 2, turnout: 95.1, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 9, section: 'B', teacher: 'Mr. P. Reddy', enrolled: 39, assessed: 37, absent: 2, turnout: 94.9, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Kokapet', grade: 10, section: 'B', teacher: 'Mrs. B. Das', enrolled: 30, assessed: 28, absent: 2, turnout: 93.3, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Kokapet', grade: 3, section: 'A', teacher: 'Ms. K. Seth', enrolled: 35, assessed: 34, absent: 1, turnout: 97.1, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 4, section: 'A', teacher: 'Mr. A. Kapoor', enrolled: 36, assessed: 34, absent: 2, turnout: 94.4, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Kokapet', grade: 5, section: 'A', teacher: 'Mrs. M. Joseph', enrolled: 38, assessed: 37, absent: 1, turnout: 97.4, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Kokapet', grade: 6, section: 'A', teacher: 'Mr. N. Bhatt', enrolled: 38, assessed: 36, absent: 2, turnout: 94.7, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Vasanth Nagar', grade: 7, section: 'A', teacher: 'Ms. F. Khan', enrolled: 35, assessed: 33, absent: 2, turnout: 94.3, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Vasanth Nagar', grade: 8, section: 'A', teacher: 'Mr. E. Thomas', enrolled: 35, assessed: 34, absent: 1, turnout: 97.1, status: 'High', statusBadge: 'success' },
+            { school: 'The Global Edge School - Vasanth Nagar', grade: 9, section: 'A', teacher: 'Mrs. U. Mishra', enrolled: 34, assessed: 32, absent: 2, turnout: 94.1, status: 'Moderate', statusBadge: 'warning' },
+            { school: 'The Global Edge School - Vasanth Nagar', grade: 10, section: 'A', teacher: 'Mr. T. George', enrolled: 30, assessed: 28, absent: 2, turnout: 93.3, status: 'Moderate', statusBadge: 'warning' }
         ];
 
         function initParticipationPage() {
@@ -2344,14 +2375,6 @@
                     </td>
                     <td>${g.boys}</td>
                     <td>${g.girls}</td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            <div class="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="bg-[#16a34a] h-2 rounded-full" style="width: ${g.turnout}%"></div>
-                            </div>
-                            <span class="font-bold text-xs">${g.turnout}%</span>
-                        </div>
-                    </td>
                     <td><span class="badge ${g.statusBadge}">${g.status}</span></td>
                 </tr>
             `).join('');
@@ -2394,14 +2417,6 @@
                             ${sec.absent} Absent ↗
                         </span>
                     </td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            <div class="w-20 bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="bg-[#16a34a] h-2 rounded-full" style="width: ${sec.turnout}%"></div>
-                            </div>
-                            <span class="font-bold text-xs">${sec.turnout}%</span>
-                        </div>
-                    </td>
                     <td><span class="badge ${sec.statusBadge}">${sec.status}</span></td>
                 </tr>
             `).join('');
@@ -2419,17 +2434,17 @@
             
             const schoolsList = [
                 { name: 'The Global Edge School - Madhapur', count: 12 },
-                { name: 'The Global Edge School - Kukatpally', count: 14 },
-                { name: 'The Global Edge School - Banjara Hills', count: 16 },
-                { name: 'The Global Edge School - Financial District', count: 18 },
-                { name: 'The Global Edge School - Gachibowli', count: 17 },
-                { name: 'The Global Edge School - Vasant Nagar', count: 14 }
+                { name: 'The Global Edge School - KPHB', count: 14 },
+                { name: 'The Global Edge School - Kokapet', count: 16 },
+                { name: 'The Global Edge School - Kokapet', count: 18 },
+                { name: 'The Global Edge School - Kokapet', count: 17 },
+                { name: 'The Global Edge School - Vasanth Nagar', count: 14 }
             ];
 
             const gradesTarget = [
                 { grade: 3, count: 8 },
                 { grade: 4, count: 12 },
-                { grade: 5, count: 8 },
+               { grade: 5, count: 8 },
                 { grade: 6, count: 10 },
                 { grade: 7, count: 11 },
                 { grade: 8, count: 12 },
@@ -2605,7 +2620,7 @@
         }
 
         function contactParentAlert(studentName, phone) {
-            alert(`📞 Connecting to Parent of ${studentName} (${phone})...\n\nAction: SMS reminder sent for SODHANA make-up diagnostic assessment.`);
+            alert(`📞 Connecting to Parent of ${studentName} (${phone})...\n\nAction: SMS reminder sent for SODHANA make-up assessment.`);
         }
 
         function scheduleStudentRetest(studentId, studentName) {
@@ -3074,7 +3089,7 @@
             }
 
             const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            let reportTitle = 'Jindal Group of Schools - SODHANA Assessment Report';
+            let reportTitle = 'The Global Edge School - SODHANA Assessment Report';
             let content = '';
 
             if (reportType === 'school') {
@@ -3087,7 +3102,7 @@
                                 <th style="padding:8px; border:1px solid #cbd5e1;">School Branch</th>
                                 <th style="padding:8px; border:1px solid #cbd5e1;">District</th>
                                 <th style="padding:8px; border:1px solid #cbd5e1;">Assessed</th>
-                                <th style="padding:8px; border:1px solid #cbd5e1;">Turnout</th>
+                                <th style="padding:8px; border:1px solid #cbd5e1;">Participation Rate</th>
                                 <th style="padding:8px; border:1px solid #cbd5e1;">Avg Score</th>
                             </tr>
                         </thead>
@@ -3109,7 +3124,7 @@
                     <h1>👨‍💼 Principal Executive Briefing</h1>
                     <p style="color:#64748b; font-size:13px;">Generated: ${now} | SODHANA Assessment</p>
                     <div style="background:#eff6ff; padding:15px; border-left:4px solid #1d4ed8; margin:20px 0;">
-                        <strong>Executive Summary:</strong> Overall participation reached <strong>96.8%</strong> (2,756 students). Average composite score is <strong>68.4%</strong>. Immediate remediation is scheduled for 356 students performing below grade level.
+                        <strong>Executive Summary:</strong> Overall participation reached <strong>96.8%</strong> (2,756 students). Average composite score is <strong>68.4%</strong>. Immediate remediation is scheduled for 356 students needing academic support.
                     </div>
                     <h3>Key Action Priorities:</h3>
                     <ul>
@@ -3122,7 +3137,7 @@
                 content = `
                     <h1>📊 Assessment Summary Report</h1>
                     <p style="color:#64748b; font-size:13px;">Generated: ${now} | SODHANA Assessment</p>
-                    <p>This report contains consolidated diagnostics and learning outcomes analytics for all Jindal Group of Schools cohorts.</p>
+                    <p>This report contains consolidated assessment and learning outcomes analytics for all The Global Edge School cohorts.</p>
                 `;
             }
 
