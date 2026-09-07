@@ -1955,6 +1955,38 @@
             }
         }
 
+        // Generic tab switcher to reduce code duplication
+        function switchTab(tabName, viewPrefix, btnPrefix, allTabs = null) {
+            // Hide all views
+            if (allTabs) {
+                allTabs.forEach(tab => {
+                    const el = document.getElementById(`${viewPrefix}-${tab}`);
+                    if (el) el.style.display = 'none';
+                });
+            } else {
+                document.querySelectorAll(`[id^="${viewPrefix}"]`).forEach(el => el.style.display = 'none');
+            }
+
+            // Reset all buttons
+            document.querySelectorAll(`[id^="${btnPrefix}"]`).forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.style.background = '#e2e8f0';
+                btn.style.color = '#334155';
+            });
+
+            // Activate selected tab
+            const activeBtn = document.getElementById(`${btnPrefix}-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('btn-primary');
+                activeBtn.style.background = '#ff751f';
+                activeBtn.style.color = '#ffffff';
+            }
+
+            // Show selected view
+            const targetView = document.getElementById(`${viewPrefix}-${tabName}`);
+            if (targetView) targetView.style.display = 'block';
+        }
+
         function setGapsTab(tabName) {
             const vSummary = document.getElementById('gaps-summary-view');
             const vQuestions = document.getElementById('gaps-questions-view');
@@ -2281,22 +2313,7 @@
         }
 
         function setParticipationTab(tabName) {
-            document.querySelectorAll('.participation-subview').forEach(el => el.style.display = 'none');
-            const bSchool = document.getElementById('btn-part-school');
-            const bGrade = document.getElementById('btn-part-grade');
-            const bSec = document.getElementById('btn-part-section');
-            if (bSchool) { bSchool.style.background = '#e2e8f0'; bSchool.style.color = '#334155'; }
-            if (bGrade) { bGrade.style.background = '#e2e8f0'; bGrade.style.color = '#334155'; }
-            if (bSec) { bSec.style.background = '#e2e8f0'; bSec.style.color = '#334155'; }
-
-            const activeBtn = document.getElementById(`btn-part-${tabName}`);
-            if (activeBtn) {
-                activeBtn.style.background = '#ff751f';
-                activeBtn.style.color = '#ffffff';
-            }
-
-            const targetView = document.getElementById(`part-view-${tabName}`);
-            if (targetView) targetView.style.display = 'block';
+            switchTab(tabName, 'part-view', 'btn-part', ['school', 'grade', 'section']);
         }
 
         function renderSchoolParticipationTable() {
