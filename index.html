@@ -844,7 +844,7 @@
                             </div>
                         </div>
                         <div class="chart-card">
-                            <div class="chart-title">🏫 School Benchmark Ranking (The Global Edge School)</div>
+                            <div class="chart-title">📊 School vs Subjects - Average Performance</div>
                             <div class="chart-canvas">
                                 <canvas id="schoolChart"></canvas>
                             </div>
@@ -1119,42 +1119,7 @@
                         </div>
                     </div>
 
-                    <!-- View 1: Competency Gaps Summary -->
-                    <div id="gaps-summary-view" class="gaps-subview mb-6">
-                        <div class="table-card">
-                            <div class="table-header">
-                                <div class="table-header-title">Competency Gap Register</div>
-                                <span class="text-xs font-semibold text-gray-500">8 Critical Deficits</span>
-                            </div>
-                            <div style="overflow-x: auto;">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Subject</th>
-                                            <th>Competency / Learning Objective</th>
-                                            <th>Grade</th>
-                                            <th>Actual</th>
-                                            <th>Gap %</th>
-                                            <th>Students Affected</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>Mathematics</td><td>Fractions - Division</td><td>5</td><td>40%</td><td><span class="gap-indicator gap-high"></span><strong>45%</strong></td><td>156</td><td><span class="badge danger">Critical</span></td></tr>
-                                        <tr><td>English</td><td>Comprehension - Inference</td><td>6</td><td>42%</td><td><span class="gap-indicator gap-high"></span><strong>38%</strong></td><td>124</td><td><span class="badge danger">Critical</span></td></tr>
-                                        <tr><td>Science</td><td>Photosynthesis</td><td>7</td><td>46%</td><td><span class="gap-indicator gap-medium"></span><strong>34%</strong></td><td>98</td><td><span class="badge warning">High</span></td></tr>
-                                        <tr><td>Mathematics</td><td>Decimals - Addition</td><td>4</td><td>53%</td><td><span class="gap-indicator gap-medium"></span><strong>32%</strong></td><td>87</td><td><span class="badge warning">High</span></td></tr>
-                                        <tr><td>English</td><td>Grammar - Tenses</td><td>5</td><td>52%</td><td><span class="gap-indicator gap-medium"></span><strong>28%</strong></td><td>72</td><td><span class="badge warning">High</span></td></tr>
-                                        <tr><td>Science</td><td>Cellular Structure</td><td>8</td><td>51%</td><td><span class="gap-indicator gap-medium"></span><strong>24%</strong></td><td>65</td><td><span class="badge warning">High</span></td></tr>
-                                        <tr><td>Mathematics</td><td>Ratio & Proportion</td><td>6</td><td>61%</td><td><span class="gap-indicator gap-medium"></span><strong>19%</strong></td><td>54</td><td><span class="badge warning">Medium</span></td></tr>
-                                        <tr><td>English</td><td>Vocabulary Building</td><td>4</td><td>70%</td><td><span class="gap-indicator gap-low"></span><strong>15%</strong></td><td>42</td><td><span class="badge success">Low</span></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- View 2: Question-Level Item Analysis (50 Questions Per Subject) -->
+                    <!-- View 1: Question-Level Item Analysis (50 Questions Per Subject) -->
                     <div id="gaps-questions-view" class="gaps-subview">
                         <div class="filter-group mb-4">
                             <select class="filter-select" id="questionSubjectFilter" onchange="renderQuestionsTable()">
@@ -2157,23 +2122,38 @@
                 charts.schoolChart = new Chart(ctx4, {
                     type: 'bar',
                     data: {
-                        labels: ['GES - Madhapur', 'GES - KPHB', 'GES - Kokapet', 'GES - Vasanth Nagar'],
-                        datasets: [{
-                            label: 'Average Score (%)',
-                            data: [72.4, 65.8, 62.1, 68.9, 64.5, 59.2],
-                            backgroundColor: (c) => {
-                                const val = c.raw;
-                                return val >= 70 ? '#16a34a' : val >= 65 ? '#2563eb' : val >= 60 ? '#f59e0b' : '#dc2626';
+                        labels: ['Madhapur', 'KPHB', 'Kokapet', 'Vasanth Nagar'],
+                        datasets: [
+                            {
+                                label: 'Mathematics',
+                                data: [72.1, 70.4, 67.8, 70.1],
+                                backgroundColor: '#1d4ed8',
+                                borderRadius: 4
                             },
-                            borderRadius: 6
-                        }]
+                            {
+                                label: 'English',
+                                data: [70.8, 68.2, 68.9, 68.5],
+                                backgroundColor: '#16a34a',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Science',
+                                data: [70.7, 70.8, 68.5, 69.0],
+                                backgroundColor: '#7e22ce',
+                                borderRadius: 4
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true, max: 100 } }
+                        plugins: {
+                            legend: { display: true, position: 'top' }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, max: 100 },
+                            x: { stacked: false }
+                        }
                     }
                 });
             }
